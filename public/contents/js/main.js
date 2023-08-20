@@ -2,14 +2,14 @@
     "use strict";
 
     // Spinner
-    var spinner = function () {
-        setTimeout(function () {
-            if ($('#spinner').length > 0) {
-                $('#spinner').removeClass('show');
-            }
-        }, 1);
-    };
-    spinner();
+    //var spinner = function () {
+    //    setTimeout(function () {
+    //        if ($('#spinner').length > 0) {
+    //            $('#spinner').removeClass('show');
+    //        }
+    //    }, 1);
+    //};
+    //spinner();
     
     
     // Back to top button
@@ -205,7 +205,7 @@
 
 // Sidebar Toggler
 function side () {
-    alert("Test");
+    
     $('.sidebar, .content').toggleClass("open");
     return false;
 };

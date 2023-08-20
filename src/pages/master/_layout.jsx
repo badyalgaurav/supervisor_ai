@@ -5,6 +5,7 @@ import Header from "../../components/common/Header";
 import Navbar from "../../components/common/Navbar";
 const Layout = () => {
     const [showSpinner, setShowSpinner] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
         // Show the spinner initially
@@ -18,6 +19,11 @@ const Layout = () => {
         // Clean up the timeout when the component unmounts or when the effect is re-run
         return () => clearTimeout(timeoutId);
     }, []); // The empty array [] ensures the effect runs only once after the initial render
+
+    const toggleSidebar = () => {
+        setIsOpen(!isOpen);
+    };
+
 
     return (
         <div>
@@ -33,10 +39,10 @@ const Layout = () => {
                     </div>
                 </div>
                 {/*<!-- Spinner End -->*/}
-                <Navbar />
-               
-                <div class="content">
-                    <Header />
+                <Navbar isOpen={isOpen} />
+
+                <div className={`content ${isOpen ? 'open' : ''}`}>
+                    <Header toggleSidebar={toggleSidebar} />
 
                     <div class="">
                      

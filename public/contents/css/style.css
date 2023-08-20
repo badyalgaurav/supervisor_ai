@@ -298,4 +298,5 @@
 
 .camera_card {
     height: calc((100vh - 78px) / 2.05);
+    padding-right: 0px;
 }
