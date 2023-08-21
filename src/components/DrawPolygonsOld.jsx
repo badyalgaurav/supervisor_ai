@@ -61,29 +61,42 @@ const DrawPolygons = ({ cameraId }) => {
     };
 
     return (
-        <div class="card d-flex flex-column h-100">
-            <div class="card-header">
-                <button style={{ marginRight: "5px" }} onClick={handleDrawRec}>Big Rectangle</button>
-                <button style={{ marginRight: "5px" }} onClick={handleDrawHex}>Normal Hexagon</button>
-                <button style={{ marginRight: "5px" }} onClick={handleDrawOct}>Small Octagon</button>
-                <button style={{ marginRight: "5px" }} onClick={handleDrawFree}>Free Draw</button>
-                <button style={{ marginRight: "5px" }} onClick={handleUpdate}>Get polygon</button>
-            </div>
-            <div class="card-body flex-grow-1 d-flex flex-column justify-content-center" style={{ padding:"0px" }}>
-                <CanvasPolygons ref={canvasRef}  
-                    defaultPolygons={polygons}
-                    polygonStyle={{
-                        fill: null,
-                        strokeWidth: 2,
-                        stroke: "green",
-                        cornerColor: "blue",
-                        cornerStyle: "circle",
-                        cornerSize: 10,
-                    }} >
-                    <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "22.6rem", width:"100%" }} />
-                </CanvasPolygons>
-            </div>
+        <div style={{ position: 'relative' }}>
+            <button style={{ marginRight: "5px" }} onClick={handleDrawRec}>Big Rectangle</button>
+            <button style={{ marginRight: "5px" }} onClick={handleDrawHex}>Normal Hexagon</button>
+            <button style={{ marginRight: "5px" }} onClick={handleDrawOct}>Small Octagon</button>
+            <button style={{ marginRight: "5px" }} onClick={handleDrawFree}>Free Draw</button>
+            <button style={{ marginRight: "5px" }} onClick={handleUpdate}>Get polygon</button>
+            <CanvasPolygons ref={canvasRef} canvasHeight={600} canvasWidth={500}
+                defaultPolygons={defaultPoints}
+                polygonStyle={{
+                    fill: null,
+                strokeWidth: 2,
+                stroke: "green",
+                cornerColor: "blue",
+                cornerStyle: "circle",
+                cornerSize: 10,
+            }} >
+
+
+                <div
+                    style={{
+                        //backgroundImage: 'url("https://picsum.photos/500/400")',
+                        //backgroundRepeat: "no-repeat",
+                        width: "500px",
+                        height: "400px",
+                    }}
+                >
+                    {/*<img src="https://picsum.photos/500/400"*/}
+                    {/*    style={{ width: '100%' }}*/}
+                    {/*/>*/}
+                    <img src={imageSrc} alt={`Camera ${cameraId}`} />
+                </div>
+
+            </CanvasPolygons>
+
         </div>
+
     );
 }
 
