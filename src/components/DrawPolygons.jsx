@@ -20,6 +20,7 @@ const DrawPolygons = ({ cameraId }) => {
     ];
     const [imageSrc, setImageSrc] = useState('');
 
+
     useEffect(() => {
         const socket = new WebSocket(`ws://localhost:8000/ws/${cameraId}`);
 
@@ -69,9 +70,11 @@ const DrawPolygons = ({ cameraId }) => {
                 <button style={{ marginRight: "5px" }} onClick={handleDrawFree}>Free Draw</button>
                 <button style={{ marginRight: "5px" }} onClick={handleUpdate}>Get polygon</button>
             </div>
-            <div class="card-body flex-grow-1 d-flex flex-column justify-content-center" style={{ padding:"0px" }}>
+            <div class="card-body flex-grow-1 d-flex flex-column" style={{ padding:"0px" }}>
                 <CanvasPolygons ref={canvasRef}  
                     defaultPolygons={polygons}
+                    canvasHeight={458}
+                    canvasWidth={812}
                     polygonStyle={{
                         fill: null,
                         strokeWidth: 2,
@@ -80,7 +83,11 @@ const DrawPolygons = ({ cameraId }) => {
                         cornerStyle: "circle",
                         cornerSize: 10,
                     }} >
-                    <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "22.6rem", width:"100%" }} />
+                    <div                 
+                    >
+                        <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "458px", width: "100%" }} />
+                    </div>
+               
                 </CanvasPolygons>
             </div>
         </div>

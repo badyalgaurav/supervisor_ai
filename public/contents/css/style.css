@@ -291,16 +291,23 @@
 /*CUSTOM STYLES BY GARRY*/
 /* Set the remaining height using calc() */
 .row {
-    height: calc(100vh - 78px); /* Subtract header height from viewport height */
+    height: calc(100vh - 54px); /* Subtract header height from viewport height */
     align-items: center;
     justify-content: center;
 }
 
 .camera_card {
-    height: calc((100vh - 78px) / 2.05);
+    height: calc((100vh - 58px) / 2.04);
     padding-right: 0px;
     
 }
     .camera_card .card {
         background: #3a3a419e;
     }
+.navbar {
+    height: 44px !important;
+}
+body {
+    font-size: 0.7rem;
+    font-weight: 600;
+}

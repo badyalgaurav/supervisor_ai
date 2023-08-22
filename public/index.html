@@ -77,6 +77,16 @@
 
     <!-- Template Javascript -->
     <script src="contents/js/main.js"></script>
+    <script>
+        
+            window.addEventListener('error', function (e) {
+                console.error(e.message);
+            // prevent React's listener from firing
+            e.stopImmediatePropagation();
+            // prevent the browser's console error message
+            e.preventDefault();
+ });
+    </script>
 </body>
 
 </html>

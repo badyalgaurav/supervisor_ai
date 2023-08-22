@@ -69,6 +69,7 @@ const DrawPolygons = ({ cameraId }) => {
             <button style={{ marginRight: "5px" }} onClick={handleUpdate}>Get polygon</button>
             <CanvasPolygons ref={canvasRef} canvasHeight={600} canvasWidth={500}
                 defaultPolygons={defaultPoints}
+                responsive={false }
                 polygonStyle={{
                     fill: null,
                 strokeWidth: 2,
