@@ -85,3 +85,36 @@ def detect_yolo_person_only(img):
 
                 cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
     return img
+
+
+def detect_yolo_person_in_boundary(img, boundary_x1, boundary_y1, boundary_x2, boundary_y2):
+    results = model(img, stream=True)
+
+    # coordinates
+    for r in results:
+        boxes = r.boxes
+
+        for box in boxes:
+            # class name
+            cls = int(box.cls[0])
+
+            # Check if the detected class is "person"
+            if classNames[cls] == "person":
+                # bounding box
+                x1, y1, x2, y2 = box.xyxy[0]
+                x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+                # Check if the person bounding box is inside the boundary rectangle
+                if boundary_x1 <= x1 and boundary_y1 <= y1 and boundary_x2 >= x2 and boundary_y2 >= y2:
+                    # Draw bounding box and other details
+                    cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 255), 3)
+                    confidence = math.ceil((box.conf[0] * 100)) / 100
+                    print("Confidence --->", confidence)
+                    org = [x1, y1]
+                    font = cv2.FONT_HERSHEY_SIMPLEX
+                    fontScale = 1
+                    color = (255, 0, 0)
+                    thickness = 2
+                    cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
+
+    return img

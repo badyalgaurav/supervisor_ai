@@ -131,7 +131,9 @@ async def get_stream(websocket: WebSocket, camera_id: int):
                 # circle_color = (0, 255, 0)  # Circle color in BGR format (green)
                 # circle_thickness = 3  # Thickness of the circle's outline
                 # cv2.circle(resized_frame, circle_center, radius, circle_color, circle_thickness)
-                resized_frame=human_detection.detect_yolo_person_only(img=resized_frame)
+
+                # resized_frame=human_detection.detect_yolo_person_only(img=resized_frame)
+                resized_frame=human_detection.detect_yolo_person_in_boundary(img=resized_frame,boundary_x1=0,boundary_y1=0,boundary_x2=800,boundary_y2=800)
 
                 ret, buffer = cv2.imencode('.jpg', resized_frame)
 
