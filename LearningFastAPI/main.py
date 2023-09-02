@@ -133,7 +133,8 @@ async def get_stream(websocket: WebSocket, camera_id: int):
                 # cv2.circle(resized_frame, circle_center, radius, circle_color, circle_thickness)
 
                 # resized_frame=human_detection.detect_yolo_person_only(img=resized_frame)
-                resized_frame=human_detection.detect_yolo_person_in_boundary(img=resized_frame,boundary_x1=0,boundary_y1=0,boundary_x2=800,boundary_y2=800)
+                # resized_frame=human_detection.detect_yolo_person_in_boundary(img=resized_frame,boundary_x1=12,boundary_y1=12,boundary_x2=408,boundary_y2=421)
+                resized_frame=human_detection.detect_yolo_person_in_polygon(img=resized_frame)
 
                 ret, buffer = cv2.imencode('.jpg', resized_frame)
 
