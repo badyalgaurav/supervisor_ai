@@ -3,6 +3,9 @@ import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 import cv2
 import time
+
+from onvif import ONVIFCamera
+
 from logic.gpt_model import chat_response, train_custom_model, res_from_custom_model, another_test_full_train_n_test, eleuther_ai_gpt_model_back
 import io
 import asyncio
@@ -145,6 +148,116 @@ async def get_stream(websocket: WebSocket, camera_id: int):
         print("Client disconnected")
     finally:
         camera.release()
+
+from queue import Queue, Empty
+from threading import Thread
+# Replace with your Hikvision camera's IP address and RTSP port
+camera_ip = '192.168.1.64'
+rtsp_port = '554'
+username = 'admin'  # Replace with your camera's username
+password = 'Trace3@123'  # Replace with your camera's password
+
+# Hikvision camera URL with authentication
+camera_url = f'rtsp://{username}:{password}@{camera_ip}:{rtsp_port}/Streaming/Channels/1'
+
+
+# Video frame buffer queue
+frame_queue = Queue(maxsize=50)  # Adjust the buffer size as needed
+# Global counter for frame skipping
+global frame_counter
+frame_counter = 0  # Initialize frame_counter as a global variable
+# Function to read frames and put them into the buffer
+def read_frames():
+    cap = cv2.VideoCapture(camera_url, cv2.CAP_FFMPEG)
+    while True:
+        success, frame = cap.read()
+        if not success:
+            print("camera stopped sending the frames")
+            break
+        frame_queue.put(frame)
+
+# Start the frame reading thread
+frame_thread = Thread(target=read_frames)
+frame_thread.daemon = True
+frame_thread.start()
+
+# Close the frame thread when the application stops
+@app.on_event("shutdown")
+def close_frame_thread():
+    frame_thread.join()
+
+#################workingfine###################
+# @app.websocket("/ws1/{camera_id}")
+# async def working_fine_without_object_detection_get_stream(websocket: WebSocket, camera_id: int):
+#     await websocket.accept()
+#
+#     try:
+#         while True:
+#             try:
+#                 # Get a frame from the buffer (frame skipping)
+#                 frame = frame_queue.get(timeout=2)  # Adjust the timeout as needed
+#
+#             except Empty:
+#                 continue
+#
+#             # Set the desired dimensions for the image
+#             # new_width = 812
+#             # new_height = 458
+#             # resized_frame = cv2.resize(frame, (new_width, new_height))
+#
+#             # Add YOLO-based person detection here using OpenCV
+#             # frame = human_detection.detect_yolo_person_in_polygon(img=frame)
+#             ret, buffer = cv2.imencode('.jpg', frame)
+#             await websocket.send_bytes(buffer.tobytes())
+#             await asyncio.sleep(0.1)
+#     except WebSocketDisconnect:
+#         print("Client disconnected")
+
+
+
+
+
+
+
+@app.websocket("/ws1/{camera_id}")
+async def get_stream_testing_object(websocket: WebSocket, camera_id: int):
+    await websocket.accept()
+
+    global frame_counter  # Access the global frame_counter
+
+    try:
+        while True:
+            try:
+                # Get a frame from the buffer (frame skipping)
+                frame = frame_queue.get(timeout=1)  # Adjust the timeout as needed
+
+                # Increment frame counter
+                frame_counter += 1
+
+                # Skip every 10th frame for object detection
+                if frame_counter % 10 != 0:
+                    continue
+
+                # Reset frame counter after 10 frames
+                frame_counter = 0
+
+                # Set the desired dimensions for the image
+                new_width = 812
+                new_height = 458
+                resized_frame = cv2.resize(frame, (new_width, new_height))
+
+                # Perform YOLO-based person detection here using OpenCV
+                # Assuming you have a function like detect_yolo_person_in_polygon
+                resized_frame = await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, resized_frame)
+
+                ret, buffer = cv2.imencode('.jpg', resized_frame)
+                await websocket.send_bytes(buffer.tobytes())
+                await asyncio.sleep(0.1)
+            except Empty:
+                continue
+    except WebSocketDisconnect:
+        print("Client disconnected")
+
 
 if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8000, debug=True)

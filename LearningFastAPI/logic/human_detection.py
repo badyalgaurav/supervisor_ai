@@ -1,4 +1,5 @@
 import cv2
+from onvif import ONVIFCamera
 import numpy as np
 from ultralytics import YOLO
 import math
@@ -140,7 +141,7 @@ def detect_yolo_person_in_boundary(img, boundary_x1, boundary_y1, boundary_x2, b
 def detect_yolo_person_in_polygon(img):
     results = model(img, stream=True)
     # Define the vertices of the polygon
-    polygon_points = np.array([(100, 100), (200, 100), (200, 200), (100, 200)], dtype=np.int32)
+    polygon_points = np.array([(100, 100), (200, 100), (200, 500), (100, 500)], dtype=np.int32)
     polygon_points = polygon_points.reshape((-1, 1, 2))
     # Iterate through the detected objects
     for r in results:
@@ -157,7 +158,7 @@ def detect_yolo_person_in_polygon(img):
                 x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
 
                 # Check if any part of the person's bounding box intersects with the polygon
-                if all(cv2.pointPolygonTest(polygon_points, (x1, y1), False) >= 0 for x1, y1 in [(x1, y1), (x2, y1), (x2, y2), (x1, y2)]):
+                if any(cv2.pointPolygonTest(polygon_points, (x1, y1), False) >= 0 for x1, y1 in [(x1, y1), (x2, y1), (x2, y2), (x1, y2)]):
                     # Draw bounding box and other details
                     cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 3)
                     confidence = math.ceil((box.conf[0] * 100)) / 100
