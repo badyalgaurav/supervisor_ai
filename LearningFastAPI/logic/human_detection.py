@@ -3,6 +3,7 @@ from onvif import ONVIFCamera
 import numpy as np
 from ultralytics import YOLO
 import math
+from logic.alarm import start_danger_alert,stop_danger_alert
 # model
 model = YOLO("/logic/yolov8n.pt")
 
@@ -114,6 +115,7 @@ def detect_yolo_person_in_boundary(img, boundary_x1, boundary_y1, boundary_x2, b
                 # if boundary_x1 <= x1 or boundary_y1 <= y1 or boundary_x2 >= x2 or boundary_y2 >= y2:
                 # Check if any part of the person's bounding box intersects with the boundary rectangle
                 if x1 < boundary_x2 and x2 > boundary_x1 and y1 < boundary_y2 and y2 > boundary_y1:
+                    play_danger_sound();
                     # Draw bounding box and other details
                     cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 3)
                     confidence = math.ceil((box.conf[0] * 100)) / 100
@@ -125,6 +127,7 @@ def detect_yolo_person_in_boundary(img, boundary_x1, boundary_y1, boundary_x2, b
                     thickness = 2
                     cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
                 else:
+
                     # Draw bounding box and other details
                     cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
                     confidence = math.ceil((box.conf[0] * 100)) / 100
@@ -138,7 +141,9 @@ def detect_yolo_person_in_boundary(img, boundary_x1, boundary_y1, boundary_x2, b
     return img
 
 #polygon
+IS_PERSON_IN_DANGER=False
 def detect_yolo_person_in_polygon(img):
+    global IS_PERSON_IN_DANGER
     results = model(img, stream=True)
     # Define the vertices of the polygon
     polygon_points = np.array([(100, 100), (200, 100), (200, 500), (100, 500)], dtype=np.int32)
@@ -159,6 +164,8 @@ def detect_yolo_person_in_polygon(img):
 
                 # Check if any part of the person's bounding box intersects with the polygon
                 if any(cv2.pointPolygonTest(polygon_points, (x1, y1), False) >= 0 for x1, y1 in [(x1, y1), (x2, y1), (x2, y2), (x1, y2)]):
+                    IS_PERSON_IN_DANGER=True
+                    start_danger_alert()
                     # Draw bounding box and other details
                     cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 3)
                     confidence = math.ceil((box.conf[0] * 100)) / 100
@@ -170,6 +177,9 @@ def detect_yolo_person_in_polygon(img):
                     thickness = 2
                     cv2.putText(img, classNames[cls], org, font, fontScale, color, thickness)
                 else:
+                    if IS_PERSON_IN_DANGER:
+                        IS_PERSON_IN_DANGER=False
+                        stop_danger_alert()
                     cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
                     confidence = math.ceil((box.conf[0] * 100)) / 100
                     print("Confidence --->", confidence)

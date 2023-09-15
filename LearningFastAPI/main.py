@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request,Response,WebSocket,WebSocketDisconnect
+from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 import cv2
@@ -10,6 +10,7 @@ from logic.gpt_model import chat_response, train_custom_model, res_from_custom_m
 import io
 import asyncio
 from fastapi.responses import StreamingResponse
+
 app = FastAPI()
 
 app.add_middleware(
@@ -19,6 +20,8 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True
 )
+
+
 @app.get("/")
 async def root(request: Request):
     return {"message": "Hello World", "root_path": request.scope.get("root_path")}
@@ -52,14 +55,19 @@ async def another_test_full_train_n_test_api(query):
     response = another_test_full_train_n_test(query)
     return {"message": response}
 
+
 @app.get("/eleuther_ai_gpt_model")
 async def eleuther_ai_gpt_model(query):
     response = eleuther_ai_gpt_model_back(query)
     return {"message": response}
+
+
 @app.get("/eleuther_ai_gpt_model")
 async def eleuther_ai_gpt_model(query):
     response = eleuther_ai_gpt_model_back(query)
     return {"message": response}
+
+
 ##----------------------------------------------LIVE CAMERA------------------------
 # def generate_frames():
 #     cap = cv2.VideoCapture(0)  # Use the camera index
@@ -112,6 +120,8 @@ async def eleuther_ai_gpt_model(query):
 #     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace;boundary=frame")
 
 from logic import human_detection
+
+
 @app.websocket("/ws/{camera_id}")
 async def get_stream(websocket: WebSocket, camera_id: int):
     camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -137,10 +147,9 @@ async def get_stream(websocket: WebSocket, camera_id: int):
 
                 # resized_frame=human_detection.detect_yolo_person_only(img=resized_frame)
                 # resized_frame=human_detection.detect_yolo_person_in_boundary(img=resized_frame,boundary_x1=12,boundary_y1=12,boundary_x2=408,boundary_y2=421)
-                resized_frame=human_detection.detect_yolo_person_in_polygon(img=resized_frame)
+                resized_frame = human_detection.detect_yolo_person_in_polygon(img=resized_frame)
 
                 ret, buffer = cv2.imencode('.jpg', resized_frame)
-
 
                 await websocket.send_bytes(buffer.tobytes())
                 await asyncio.sleep(0.1)
@@ -149,8 +158,10 @@ async def get_stream(websocket: WebSocket, camera_id: int):
     finally:
         camera.release()
 
+
 from queue import Queue, Empty
 from threading import Thread
+
 # Replace with your Hikvision camera's IP address and RTSP port
 camera_ip = '192.168.1.64'
 rtsp_port = '554'
@@ -160,12 +171,13 @@ password = 'Trace3@123'  # Replace with your camera's password
 # Hikvision camera URL with authentication
 camera_url = f'rtsp://{username}:{password}@{camera_ip}:{rtsp_port}/Streaming/Channels/1'
 
-
 # Video frame buffer queue
 frame_queue = Queue(maxsize=50)  # Adjust the buffer size as needed
 # Global counter for frame skipping
 global frame_counter
 frame_counter = 0  # Initialize frame_counter as a global variable
+
+
 # Function to read frames and put them into the buffer
 def read_frames():
     cap = cv2.VideoCapture(camera_url, cv2.CAP_FFMPEG)
@@ -173,92 +185,86 @@ def read_frames():
         success, frame = cap.read()
         if not success:
             print("camera stopped sending the frames")
-            break
+            read_frames()
+            # break
         frame_queue.put(frame)
+
 
 # Start the frame reading thread
 frame_thread = Thread(target=read_frames)
 frame_thread.daemon = True
 frame_thread.start()
 
+
 # Close the frame thread when the application stops
 @app.on_event("shutdown")
 def close_frame_thread():
     frame_thread.join()
 
+
+# @app.websocket("/ws1/{camera_id}")
+# async def get_stream_testing_object(websocket: WebSocket, camera_id: int):
+#     await websocket.accept()
+#     global frame_counter  # Access the global frame_counter
+#     while True:
+#         try:
+#             # Get a frame from the buffer (frame skipping)
+#             frame = frame_queue.get(timeout=1)  # Adjust the timeout as needed
+#             # Increment frame counter
+#             frame_counter += 1
+#             # Skip every 10th frame for object detection
+#             if frame_counter % 2 != 0:
+#                 continue
+#             # Reset frame counter after 10 frames
+#             frame_counter = 0
+#             # Assuming you have a function like detect_yolo_person_in_polygon
+#             resized_frame = await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, frame)
+#             ret, buffer = cv2.imencode('.jpg', frame)
+#             await websocket.send_bytes(buffer.tobytes())
+#             await asyncio.sleep(0.5)
+#         except Empty:
+#             continue
+@app.websocket("/ws1/{camera_id}")
+async def working_fine_without_object_detection_get_stream(websocket: WebSocket, camera_id: int):
+    await websocket.accept()
+    global frame_counter
+    try:
+        while True:
+            try:
+                # Get a frame from the buffer (frame skipping)
+                frame = frame_queue.get(timeout=2)  # Adjust the timeout as needed
+                frame_counter += 1
+                if frame_counter % 3 != 0:
+                    continue
+                frame_counter = 0
+                # Resize frame to a smaller resolution
+                frame = cv2.resize(frame, (640, 360))  # Adjust the resolution as needed
+
+                resized_frame = await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, frame)
+            except Empty:
+                continue
+            ret, buffer = cv2.imencode('.jpg', frame)
+            await websocket.send_bytes(buffer.tobytes())
+            await asyncio.sleep(0.1)
+    except WebSocketDisconnect:
+        print("Client disconnected")
+
 #################workingfine###################
 # @app.websocket("/ws1/{camera_id}")
 # async def working_fine_without_object_detection_get_stream(websocket: WebSocket, camera_id: int):
 #     await websocket.accept()
-#
 #     try:
 #         while True:
 #             try:
 #                 # Get a frame from the buffer (frame skipping)
 #                 frame = frame_queue.get(timeout=2)  # Adjust the timeout as needed
-#
 #             except Empty:
 #                 continue
-#
-#             # Set the desired dimensions for the image
-#             # new_width = 812
-#             # new_height = 458
-#             # resized_frame = cv2.resize(frame, (new_width, new_height))
-#
-#             # Add YOLO-based person detection here using OpenCV
-#             # frame = human_detection.detect_yolo_person_in_polygon(img=frame)
 #             ret, buffer = cv2.imencode('.jpg', frame)
 #             await websocket.send_bytes(buffer.tobytes())
 #             await asyncio.sleep(0.1)
 #     except WebSocketDisconnect:
 #         print("Client disconnected")
 
-
-
-
-
-
-
-@app.websocket("/ws1/{camera_id}")
-async def get_stream_testing_object(websocket: WebSocket, camera_id: int):
-    await websocket.accept()
-
-    global frame_counter  # Access the global frame_counter
-
-    try:
-        while True:
-            try:
-                # Get a frame from the buffer (frame skipping)
-                frame = frame_queue.get(timeout=1)  # Adjust the timeout as needed
-
-                # Increment frame counter
-                frame_counter += 1
-
-                # Skip every 10th frame for object detection
-                if frame_counter % 10 != 0:
-                    continue
-
-                # Reset frame counter after 10 frames
-                frame_counter = 0
-
-                # Set the desired dimensions for the image
-                new_width = 812
-                new_height = 458
-                resized_frame = cv2.resize(frame, (new_width, new_height))
-
-                # Perform YOLO-based person detection here using OpenCV
-                # Assuming you have a function like detect_yolo_person_in_polygon
-                resized_frame = await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, resized_frame)
-
-                ret, buffer = cv2.imencode('.jpg', resized_frame)
-                await websocket.send_bytes(buffer.tobytes())
-                await asyncio.sleep(0.1)
-            except Empty:
-                continue
-    except WebSocketDisconnect:
-        print("Client disconnected")
-
-
 if __name__ == '__main__':
     uvicorn.run(app, host='127.0.0.1', port=8000, debug=True)
-
