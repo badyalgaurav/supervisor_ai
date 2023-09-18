@@ -86,7 +86,7 @@ const DrawPolygons = ({ cameraId }) => {
                     }} >
                     <div                 
                     >
-                        <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "458px", width: "812px" }} />
+                        <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "460px", width: "820px" }} />
                     </div>
                
                 </CanvasPolygons>
