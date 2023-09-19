@@ -42,11 +42,11 @@ const Layout = () => {
                 <Navbar isOpen={isOpen} />
 
                 <div className={`content ${isOpen ? 'open' : ''}`}>
-                    <Header toggleSidebar={toggleSidebar} />
+                    {/*<Header toggleSidebar={toggleSidebar} />*/}
 
                     <div class="">
                      
-                        <div class="container-fluid pt-2 px-2">
+                        <div class="container-fluid px-2">
                             <Outlet />
                         </div>
                     </div>
