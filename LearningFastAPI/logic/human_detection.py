@@ -80,6 +80,6 @@ def detect_yolo_person_in_polygon(img):
             print("no person not in danger zone")
 
     # Draw the polygon on the image
-    # cv2.polylines(img, [polygon_points], isClosed=True, color=(255, 255, 0), thickness=4)
+    cv2.polylines(img, [polygon_points], isClosed=True, color=(255, 255, 0), thickness=4)
 
     return img

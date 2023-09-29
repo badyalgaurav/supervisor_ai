@@ -42,9 +42,15 @@ def read_frames():
     while True:
         success, frame = cap.read()
         if not success:
-            print("camera stopped sending the frames")
-            read_frames()
-            # break
+            print("Camera stopped sending frames")
+            # You can choose to exit the loop or take other appropriate action
+            break
+        # Clear the queue before putting the latest frame to ensure only the latest frame is in the queue
+        while not frame_queue.empty():
+            try:
+                frame_queue.get_nowait()
+            except Empty:
+                continue
         frame_queue.put(frame)
 
 
@@ -59,69 +65,69 @@ frame_thread.start()
 def close_frame_thread():
     frame_thread.join()
 
-# @app.websocket("/ws1/{camera_id}")
-# async def working_fine_with_object_detection_get_stream(websocket: WebSocket, camera_id: int):
-#     await websocket.accept()
-#     global frame_counter
-#     try:
-#         while True:
-#             try:
-#                 # Get a frame from the buffer (frame skipping)
-#                 frame = frame_queue.get(timeout=2)  # Adjust the timeout as needed
-#                 frame_counter += 1
-#                 if frame_counter % 3 != 0:
-#                     continue
-#                 frame_counter = 0
-#                 # Resize frame to a smaller resolution
-#                 frame = cv2.resize(frame, (820, 460))  # Adjust the resolution as needed
-#
-#                 resized_frame = await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, frame)
-#             except Empty:
-#                 continue
-#             ret, buffer = cv2.imencode('.jpg', frame)
-#             await websocket.send_bytes(buffer.tobytes())
-#             await asyncio.sleep(0.1)
-#     except WebSocketDisconnect:
-#         print("Client disconnected")
-
-
-
-
-@app.websocket("/ws/{camera_id}")
-async def get_stream(websocket: WebSocket, camera_id: int):
-    camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+@app.websocket("/ws1/{camera_id}")
+async def working_fine_with_object_detection_get_stream(websocket: WebSocket, camera_id: int):
     await websocket.accept()
-
+    global frame_counter
     try:
         while True:
-            success, frame = camera.read()
-            if not success:
-                break
-            else:
-                # Set the desired dimensions for the image
-                new_width = 812
-                new_height = 458
-                resized_frame = cv2.resize(frame, (new_width, new_height))
+            try:
+                # Get a frame from the buffer (frame skipping)
+                frame = frame_queue.get(timeout=1,block=True)  # Adjust the timeout as needed
+                frame_counter += 1
+                if frame_counter % 3 != 0:
+                    continue
+                frame_counter = 0
+                # Resize frame to a smaller resolution
+                frame = cv2.resize(frame, (820, 460))  # Adjust the resolution as needed
 
-                # Add a circle to the frame
-                # circle_center = (320, 240)  # Center of the circle (x, y)
-                # radius = 50  # Radius of the circle
-                # circle_color = (0, 255, 0)  # Circle color in BGR format (green)
-                # circle_thickness = 3  # Thickness of the circle's outline
-                # cv2.circle(resized_frame, circle_center, radius, circle_color, circle_thickness)
-
-                # resized_frame=human_detection.detect_yolo_person_only(img=resized_frame)
-                # resized_frame=human_detection.detect_yolo_person_in_boundary(img=resized_frame,boundary_x1=12,boundary_y1=12,boundary_x2=408,boundary_y2=421)
-                resized_frame = human_detection.detect_yolo_person_in_polygon(img=resized_frame)
-
-                ret, buffer = cv2.imencode('.jpg', resized_frame)
-
-                await websocket.send_bytes(buffer.tobytes())
-                await asyncio.sleep(0.1)
+                resized_frame = await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, frame)
+            except Empty:
+                continue
+            ret, buffer = cv2.imencode('.jpg', frame)
+            await websocket.send_bytes(buffer.tobytes())
+            # await asyncio.sleep(0.1)
     except WebSocketDisconnect:
         print("Client disconnected")
-    finally:
-        camera.release()
+
+
+
+
+# @app.websocket("/ws1/{camera_id}")
+# async def get_stream(websocket: WebSocket, camera_id: int):
+#     camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+#     await websocket.accept()
+#
+#     try:
+#         while True:
+#             success, frame = camera.read()
+#             if not success:
+#                 break
+#             else:
+#                 # Set the desired dimensions for the image
+#                 new_width = 812
+#                 new_height = 458
+#                 resized_frame = cv2.resize(frame, (new_width, new_height))
+#
+#                 # Add a circle to the frame
+#                 # circle_center = (320, 240)  # Center of the circle (x, y)
+#                 # radius = 50  # Radius of the circle
+#                 # circle_color = (0, 255, 0)  # Circle color in BGR format (green)
+#                 # circle_thickness = 3  # Thickness of the circle's outline
+#                 # cv2.circle(resized_frame, circle_center, radius, circle_color, circle_thickness)
+#
+#                 # resized_frame=human_detection.detect_yolo_person_only(img=resized_frame)
+#                 # resized_frame=human_detection.detect_yolo_person_in_boundary(img=resized_frame,boundary_x1=12,boundary_y1=12,boundary_x2=408,boundary_y2=421)
+#                 resized_frame = human_detection.detect_yolo_person_in_polygon(img=resized_frame)
+#
+#                 ret, buffer = cv2.imencode('.jpg', resized_frame)
+#
+#                 await websocket.send_bytes(buffer.tobytes())
+#                 await asyncio.sleep(0.1)
+#     except WebSocketDisconnect:
+#         print("Client disconnected")
+#     finally:
+#         camera.release()
 #################workingfine###################
 # @app.websocket("/ws1/{camera_id}")
 # async def working_fine_without_object_detection_get_stream(websocket: WebSocket, camera_id: int):

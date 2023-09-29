@@ -23,7 +23,7 @@ const DrawPolygons = ({ cameraId }) => {
 
 
     useEffect(() => {
-        const socket = new WebSocket(`ws://localhost:8000/ws/${cameraId}`);
+        const socket = new WebSocket(`ws://localhost:8000/ws1/${cameraId}`);
 
         socket.binaryType = 'arraybuffer';
 

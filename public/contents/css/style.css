@@ -317,3 +317,12 @@ body {
     font-size: 0.7rem;
     font-weight: 600;
 }
+.card {
+    background: #3a3a419e;
+}
+.navbar_card {
+    height: calc((100vh) / 4.45);
+}
+.navbar-card-body {
+    overflow: auto;
+}

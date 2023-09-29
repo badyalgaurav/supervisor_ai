@@ -23,7 +23,7 @@ const DashboardCamCard = ({ cameraId }) => {
 
 
     useEffect(() => {
-        const socket = new WebSocket(`ws://localhost:8000/ws/${cameraId}`);
+        const socket = new WebSocket(`ws://localhost:8000/ws1/${cameraId}`);
 
         socket.binaryType = 'arraybuffer';
 
@@ -43,7 +43,7 @@ const DashboardCamCard = ({ cameraId }) => {
             <div class="card-body flex-grow-1 d-flex flex-column" style={{ padding: "0px" }}>
                 <CanvasPolygons ref={canvasRef}
                     defaultPolygons={polygons}
-                    canvasHeight={534}
+                    canvasHeight={512}
                     canvasWidth={812}
                     polygonStyle={{
                         fill: null,
@@ -53,7 +53,7 @@ const DashboardCamCard = ({ cameraId }) => {
                         cornerStyle: "circle",
                         cornerSize: 10,
                     }}>
-                    <div> <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "534px", width: "812px" }} /> </div>
+                    <div> <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "512px", width: "812px" }} /> </div>
                 </CanvasPolygons>
             </div>
         </div>
