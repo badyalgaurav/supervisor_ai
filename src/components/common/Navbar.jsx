@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import NavbarCamCard from "../../components/NavbarCamCard"
+
 const Navbar = (props) => {
+    
     return (
         <>
             <div className={`sidebar pb-3 ${props.isOpen ? 'open' : ''}`}>
@@ -11,17 +13,17 @@ const Navbar = (props) => {
                     <div class="navbar-nav w-100">
                         <div class="nav-item dropdown">
                             <div className="">
-                                <NavbarCamCard></NavbarCamCard>
+                                <NavbarCamCard camNo={"1"}></NavbarCamCard>
                             </div>
 
                             <div className="">
-                                <NavbarCamCard></NavbarCamCard>
+                                <NavbarCamCard camNo={"2"}></NavbarCamCard>
                             </div>
                             <div className="">
-                                <NavbarCamCard></NavbarCamCard>
+                                <NavbarCamCard camNo={"3"}></NavbarCamCard>
                             </div>
                             <div className="">
-                                <NavbarCamCard></NavbarCamCard>
+                                <NavbarCamCard camNo={"4"}></NavbarCamCard>
                             </div>
                         </div>
                     </div>

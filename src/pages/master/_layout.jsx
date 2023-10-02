@@ -3,7 +3,10 @@ import { Outlet } from 'react-router-dom';
 
 import Header from "../../components/common/Header";
 import Navbar from "../../components/common/Navbar";
+import { MainContextProvider } from "../../utils/MainContextProvider";
 const Layout = () => {
+    //const initPolygonStatus = { "cam_1": false, "cam_2": false, "cam_3": false, "cam_4": false}
+    const [updatePolygonStatus, setUpdatePolygonStatus] = useState([false,false,false,false]);
     const [showSpinner, setShowSpinner] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -23,10 +26,24 @@ const Layout = () => {
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
+    
 
+    const updatePolygonStatusFn = (newValue, camNo) => {
+        setUpdatePolygonStatus(prevState => {
+            // Create a copy of the existing state array
+            const currentPolygonStatus = [...prevState];
+
+            // Update the copy with the new value at the specified index
+            currentPolygonStatus[parseInt(camNo) - 1] = newValue;
+
+            // Return the modified copy as the new state
+            return currentPolygonStatus;
+        });
+    };
 
     return (
         <div>
+            <MainContextProvider.Provider value={{ updatePolygonStatus, updatePolygonStatusFn }}>
             <div class="container-fluid position-relative d-flex p-0">
                 {/*<!-- Spinner Start -->*/}
                 <div
@@ -52,7 +69,8 @@ const Layout = () => {
                     </div>
                 </div>
                 {/* <Footer /> */}
-            </div>
+                </div>
+            </MainContextProvider.Provider>
         </div>
     );
 };

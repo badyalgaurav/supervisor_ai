@@ -1,13 +1,11 @@
 // Example for draw polygon
 //reference https://www.jsdelivr.com/package/npm/react-draw-polygons
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
 import CanvasPolygons, { POLYGON_SIZE, POLYGON_TYPE } from "react-draw-polygons";
-
+import { MainContextProvider } from "../utils/MainContextProvider";
 const DashboardCamCard = ({ cameraId }) => {
+    const contextData = useContext(MainContextProvider);
     const canvasRef = useRef();
-
-    const defaultPoints = [{ "polygon": [{ "x": 465.20965591251695, "y": 153.624598516918 }, { "x": 354.9224184225682, "y": 96.19237876200808 }, { "x": 246.23161823749055, "y": 211.96072484645168 }, { "x": 343.4320077114818, "y": 409.98366363411947 }, { "x": 497.62540021763226, "y": 370.08526358368107 }], "label": "Label 1" }, { "polygon": [{ "x": 129.1745355192333, "y": 267.2255223916952 }, { "x": 81.42131184930514, "y": 330.38927044373355 }, { "x": 92.31819814153585, "y": 408.8194132970125 }, { "x": 155.48194619357415, "y": 456.57263696694054 }, { "x": 233.912089046853, "y": 445.6757506747099 }, { "x": 281.6653127167811, "y": 382.5120026226717 }, { "x": 270.76842642455046, "y": 304.0818597693926 }, { "x": 207.60467837251227, "y": 256.3286360994645 }], "label": "Label 2" }]
-
     const polygons = [
         {
             polygon: [
@@ -37,6 +35,19 @@ const DashboardCamCard = ({ cameraId }) => {
         };
     }, [cameraId]);
 
+    const handleDrawFree = () => {
+        // @ts-ignore
+        canvasRef.current.toggleDraw();
+    };
+    // This function will be called whenever contextData changes
+    useEffect(() => {
+        // Execute your desired function here
+        console.log('Context Data has changed:', contextData.updatePolygonStatus);
+        if (contextData.updatePolygonStatus[parseInt(cameraId) - 1] == true) {
+            canvasRef.current.toggleDraw();
+        }
+
+    }, [contextData]);
     return (
         <div class="card d-flex flex-column h-100">
 
@@ -45,6 +56,7 @@ const DashboardCamCard = ({ cameraId }) => {
                     defaultPolygons={polygons}
                     canvasHeight={512}
                     canvasWidth={812}
+                    canEdit={contextData.updatePolygonStatus[parseInt(cameraId)-1]}
                     polygonStyle={{
                         fill: null,
                         strokeWidth: 2,
