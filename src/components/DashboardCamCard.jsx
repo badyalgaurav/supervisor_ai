@@ -46,6 +46,10 @@ const DashboardCamCard = ({ cameraId }) => {
         if (contextData.updatePolygonStatus[parseInt(cameraId) - 1] == true) {
             canvasRef.current.toggleDraw();
         }
+        if (contextData.savePolygonStatus[parseInt(cameraId) - 1] == true) {
+            alert(JSON.stringify(canvasRef.current.onConfirm()))
+            contextData.savePolygonStatusFn(false, cameraId)
+        }
 
     }, [contextData]);
     return (

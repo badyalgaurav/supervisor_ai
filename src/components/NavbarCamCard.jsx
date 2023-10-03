@@ -14,15 +14,16 @@ const NavbarCamCard = (props) => {
     }
     const handleSavePolygon = () => {
         contextData.updatePolygonStatusFn(false,camNo)
+        contextData.savePolygonStatusFn(true, camNo)
         setEditBtn(false)
         alert(camNo);
+
     }
 
     return (<>
         <div className="card navbar_card mt-2">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h6>camera {camNo}</h6>
-                <p>Context State: {contextData.updatePolygonStatus}</p>
                 <div>
                     {editBtn ? (
                         <button title="edit or add polygon" onClick={handleSavePolygon} type="button" class="btn btn-sm btn-sm-square btn-outline-primary"><i class="fas fa-save"></i></button>
