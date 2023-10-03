@@ -2,7 +2,9 @@
 //reference https://www.jsdelivr.com/package/npm/react-draw-polygons
 import React, { useRef, useState, useEffect, useContext } from "react";
 import CanvasPolygons, { POLYGON_SIZE, POLYGON_TYPE } from "react-draw-polygons";
+import axios from 'axios';
 import { MainContextProvider } from "../utils/MainContextProvider";
+import { apiSAIFrameworkAPIPath, apiWebSocketPath } from "../config"
 const DashboardCamCard = ({ cameraId }) => {
     const contextData = useContext(MainContextProvider);
     const canvasRef = useRef();
@@ -35,10 +37,26 @@ const DashboardCamCard = ({ cameraId }) => {
         };
     }, [cameraId]);
 
-    const handleDrawFree = () => {
-        // @ts-ignore
-        canvasRef.current.toggleDraw();
-    };
+
+    const handSavePolygon = (cameraId, polygonInfo) => {
+        
+        const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/upsert_polygon/`; // Replace with your API endpoint URL
+        const requestData = {
+            "camera_no": parseInt(cameraId),
+            "polygon_info": polygonInfo,
+        };
+
+        axios.post(apiUrl, requestData)
+            .then((response) => {
+                // Handle the successful response here
+                console.log('Response data:', response.data);
+            })
+            .catch((error) => {
+                // Handle any errors that occurred during the request
+                console.error('Error:', error);
+            });
+    }
+
     // This function will be called whenever contextData changes
     useEffect(() => {
         // Execute your desired function here
@@ -47,8 +65,9 @@ const DashboardCamCard = ({ cameraId }) => {
             canvasRef.current.toggleDraw();
         }
         if (contextData.savePolygonStatus[parseInt(cameraId) - 1] == true) {
-            alert(JSON.stringify(canvasRef.current.onConfirm()))
+            //alert(JSON.stringify(canvasRef.current.onConfirm()))
             contextData.savePolygonStatusFn(false, cameraId)
+            handSavePolygon(cameraId, JSON.stringify(canvasRef.current.onConfirm()))
         }
 
     }, [contextData]);

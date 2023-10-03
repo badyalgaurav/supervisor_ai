@@ -10,13 +10,13 @@ const NavbarCamCard = (props) => {
     const handleDrawPolygon = () => {
         contextData.updatePolygonStatusFn(true,camNo)
         setEditBtn(true)
-        alert(camNo);
+        //alert(camNo);
     }
     const handleSavePolygon = () => {
         contextData.updatePolygonStatusFn(false,camNo)
         contextData.savePolygonStatusFn(true, camNo)
         setEditBtn(false)
-        alert(camNo);
+        //alert(camNo);
 
     }
 
