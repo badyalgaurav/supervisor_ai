@@ -5,7 +5,7 @@ const Dashboard = () => {
     return (<>
         <div class="row bg-secondary rounded align-items-center justify-content-center mx-0">
             <div class="col-md-6 camera_card camera_right_padding">
-                <DashboardCamCardSetting cameraId={"1"}></DashboardCamCardSetting>
+                <DashboardCamCard cameraId={"1"}></DashboardCamCard>
             </div>
             <div class="col-md-6 camera_card camera_left_padding">
                 <DashboardCamCard cameraId={"2"}></DashboardCamCard>

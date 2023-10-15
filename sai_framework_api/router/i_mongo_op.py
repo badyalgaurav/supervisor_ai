@@ -6,8 +6,8 @@ router = APIRouter(prefix="/mongo_op", tags=["mongo_op"])
 
 
 @router.get("/get_polygon")
-async def get_polygon(camera_no: int):
-    res = mongo_op.get_polygon(camera_no=camera_no)
+async def get_polygon():
+    res = mongo_op.get_polygon()
     return res
 
 

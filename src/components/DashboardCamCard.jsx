@@ -6,23 +6,28 @@ import axios from 'axios';
 import { MainContextProvider } from "../utils/MainContextProvider";
 import { apiSAIFrameworkAPIPath, apiWebSocketPath } from "../config"
 const DashboardCamCard = ({ cameraId }) => {
+ 
+    
     const contextData = useContext(MainContextProvider);
     const canvasRef = useRef();
-    const polygons = [
-        {
-            polygon: [
-                { x: 100, y: 100 },
-                { x: 200, y: 100 },
-                { x: 200, y: 200 },
-                { x: 100, y: 200 }
-            ]
-        }
-    ];
+    const polygons = JSON.parse(localStorage.getItem(`polyFor_${cameraId}`));//contextData.polygonInfo;
+    //[
+    //    {
+    //        polygon: [
+    //            { x: 100, y: 100 },
+    //            { x: 200, y: 100 },
+    //            { x: 200, y: 200 },
+    //            { x: 100, y: 200 }
+    //        ]
+    //    }
+    //];
     //const polygons = [{ "polygon": [{ "x": 12.369884641415041, "y": 27.995807173017425 }, { "x": 408.60020994000314, "y": 27.995807173017425 }, { "x": 394.0000000000001, "y": 416.6757530325747 }, { "x": 8, "y": 421.6696197355868 }], "label": "Label 1" }]
     const [imageSrc, setImageSrc] = useState('');
 
 
     useEffect(() => {
+        //handleGetPolygon(cameraId)
+        console.log("socket useeffect")
         const socket = new WebSocket(`ws://localhost:8000/ws1/${cameraId}`);
 
         socket.binaryType = 'arraybuffer';
@@ -37,7 +42,25 @@ const DashboardCamCard = ({ cameraId }) => {
         };
     }, [cameraId]);
 
+    //const handleGetPolygon = (cameraId) => {
+    //    const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_polygon`; // Replace with your API endpoint URL
+    //    const requestData = {
+    //        "camera_no": parseInt(cameraId)
+           
+    //    };
 
+    //    axios.get(apiUrl, {
+    //        params: requestData
+    //    })
+    //        .then((response) => {
+    //            // Handle the successful response here
+    //            console.log('Response data:', response.data.data.polygonInfo);
+    //        })
+    //        .catch((error) => {
+    //            // Handle any errors that occurred during the request
+    //            console.error('Error:', error);
+    //        });
+    //}
     const handSavePolygon = (cameraId, polygonInfo) => {
         
         const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/upsert_polygon/`; // Replace with your API endpoint URL
@@ -59,6 +82,7 @@ const DashboardCamCard = ({ cameraId }) => {
 
     // This function will be called whenever contextData changes
     useEffect(() => {
+        
         // Execute your desired function here
         console.log('Context Data has changed:', contextData.updatePolygonStatus);
         if (contextData.updatePolygonStatus[parseInt(cameraId) - 1] == true) {
@@ -71,24 +95,26 @@ const DashboardCamCard = ({ cameraId }) => {
         }
 
     }, [contextData]);
+
+
     return (
         <div class="card d-flex flex-column h-100">
 
             <div class="card-body flex-grow-1 d-flex flex-column" style={{ padding: "0px" }}>
                 <CanvasPolygons ref={canvasRef}
                     defaultPolygons={polygons}
-                    canvasHeight={512}
+                    canvasHeight={534}
                     canvasWidth={812}
                     canEdit={contextData.updatePolygonStatus[parseInt(cameraId)-1]}
                     polygonStyle={{
                         fill: null,
-                        strokeWidth: 2,
-                        stroke: "green",
+                        strokeWidth: 4,
+                        stroke: "yellow",
                         cornerColor: "blue",
                         cornerStyle: "circle",
                         cornerSize: 10,
                     }}>
-                    <div> <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "512px", width: "812px" }} /> </div>
+                    <div> <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "534px", width: "812px" }} /> </div>
                 </CanvasPolygons>
             </div>
         </div>

@@ -1,6 +1,6 @@
 from pymongo import MongoClient
-
-
+import pandas as pd
+import json
 def GetClientUpdateByComapnyCode():
     serverAddress = "127.0.0.1:27017"
     client = MongoClient(f"mongodb://{serverAddress}")
@@ -15,10 +15,11 @@ def upsert_polygon(polygon_info: str, camera_no: int):
     return True
 
 
-def get_polygon(camera_no: int):
+def get_polygon():
     res = {"data": None, "message": "MSG_100"}
     client = GetClientUpdateByComapnyCode()
     db = client["supervisorAI"]
     coll = db["polygonInfo"]
-    res["data"] = coll.find_one({"camera_no": camera_no}, {"_id": 0})
+    df = pd.DataFrame(coll.find({}, {"_id": 0})).to_json(orient="records")
+    res["data"] = json.loads(df)
     return res

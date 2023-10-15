@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-
+import pandas as pd
 
 def GetClientUpdateByComapnyCode():
     serverAddress = "127.0.0.1:27017"
@@ -22,3 +22,23 @@ def get_polygon(camera_no: int):
     coll = db["polygonInfo"]
     res["data"] = coll.find_one({"camera_no": camera_no}, {"_id": 0})
     return res
+
+def get_all_polygon():
+    client = GetClientUpdateByComapnyCode()
+    db = client["supervisorAI"]
+    coll = db["polygonInfo"]
+    df=pd.DataFrame(coll.find({}, {"_id": 0}))
+    # Loop over the rows using iterrows()
+    response = {}
+
+    for index, row in df.iterrows():
+        polygon_list = []
+        for polygon in row["polygonInfo"]:
+            result = [(item['x'], item['y']) for item in polygon.get("polygon")]
+            polygon_list.append(result)
+            print(f"{polygon}")
+
+        response[row.get("camera_no")]=polygon_list
+
+
+    return response
