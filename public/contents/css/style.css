@@ -73,7 +73,7 @@
     overflow-y: auto;
     background: var(--secondary);
     transition: 0.5s;
-    z-index: 999;
+    /*z-index: 999;*/
 }
 
 .content {
