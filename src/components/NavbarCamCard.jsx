@@ -29,7 +29,7 @@ const NavbarCamCard = (props) => {
     };
 
     return (<>
-        <div className="card navbar_card mt-2" style={{ zIndex: 999 }}>
+        <div className="card navbar_card mt-2">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h6>camera {camNo}</h6>
                 <div>
