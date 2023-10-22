@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 import pandas as pd
+import numpy as np
+
 
 def GetClientUpdateByComapnyCode():
     serverAddress = "127.0.0.1:27017"
@@ -23,11 +25,12 @@ def get_polygon(camera_no: int):
     res["data"] = coll.find_one({"camera_no": camera_no}, {"_id": 0})
     return res
 
+
 def get_all_polygon():
     client = GetClientUpdateByComapnyCode()
     db = client["supervisorAI"]
     coll = db["polygonInfo"]
-    df=pd.DataFrame(coll.find({}, {"_id": 0}))
+    df = pd.DataFrame(coll.find({}, {"_id": 0}))
     # Loop over the rows using iterrows()
     response = {}
 
@@ -35,10 +38,18 @@ def get_all_polygon():
         polygon_list = []
         for polygon in row["polygonInfo"]:
             result = [(item['x'], item['y']) for item in polygon.get("polygon")]
+            result = np.array(result, dtype=np.int32)
+            result = result.reshape((-1, 1, 2))
             polygon_list.append(result)
-            print(f"{polygon}")
+        response[row.get("camera_no")] = polygon_list
 
-        response[row.get("camera_no")]=polygon_list
-
-
+    print("successfully data loaded")
     return response
+
+
+def insert_events_db(camera_id, video_path, start_time, end_time):
+    client = GetClientUpdateByComapnyCode()
+    db = client["supervisorAI"]
+    coll = db["productionData"]
+    coll.insert_one({"cameraId": camera_id, "videoPath": video_path, "startTime": start_time, "endTime": end_time})
+    return True

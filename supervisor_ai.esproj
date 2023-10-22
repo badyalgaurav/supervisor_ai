@@ -14,5 +14,6 @@
   <ItemGroup>
     <Folder Include="src\components\common\" />
     <Folder Include="src\pages\dashboard\" />
+    <Folder Include="src\pages\reports\" />
   </ItemGroup>
 </Project>

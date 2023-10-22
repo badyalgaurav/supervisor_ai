@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 
 import Layout from './pages/master/_layout';
 import Dashboard from './pages/dashboard/Dashboard';
+import AlertEventsReport from './pages/reports/AlertEventsReport';
 
 function Root() {
     const navigate = useNavigate();
@@ -23,6 +24,7 @@ function Root() {
              
                 <Route path="/" element={<Layout />}>
                     <Route path="/" element={<Dashboard />} />
+                    <Route path="/AlertEventsReport" element={<AlertEventsReport />} />
                 </Route>
             </Routes>
         </div>);

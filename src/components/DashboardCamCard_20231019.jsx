@@ -1,9 +1,8 @@
 // Example for draw polygon
 //reference https://www.jsdelivr.com/package/npm/react-draw-polygons
 import React, { useRef, useState, useEffect, useContext } from "react";
-import axios from 'axios';
-import Swal from "sweetalert2";
 import CanvasPolygons, { POLYGON_SIZE, POLYGON_TYPE } from "react-draw-polygons";
+import axios from 'axios';
 import { MainContextProvider } from "../utils/MainContextProvider";
 import { apiSAIFrameworkAPIPath, apiWebSocketPath } from "../config"
 const DashboardCamCard = ({ cameraId }) => {
@@ -42,17 +41,29 @@ const DashboardCamCard = ({ cameraId }) => {
             socket.close();
         };
     }, [cameraId]);
-    const showSuccessAlert = () => {
-        Swal.fire({
-            icon: "success",
-            title: "Saved!",
-            text: "Your changes have been successfully saved.",
-        });
-    };
 
+    //const handleGetPolygon = (cameraId) => {
+    //    const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_polygon`; // Replace with your API endpoint URL
+    //    const requestData = {
+    //        "camera_no": parseInt(cameraId)
+           
+    //    };
+
+    //    axios.get(apiUrl, {
+    //        params: requestData
+    //    })
+    //        .then((response) => {
+    //            // Handle the successful response here
+    //            console.log('Response data:', response.data.data.polygonInfo);
+    //        })
+    //        .catch((error) => {
+    //            // Handle any errors that occurred during the request
+    //            console.error('Error:', error);
+    //        });
+    //}
     const handSavePolygon = (cameraId, polygonInfo) => {
         
-        const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/upsert_polygon/`; 
+        const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/upsert_polygon/`; // Replace with your API endpoint URL
         const requestData = {
             "camera_no": parseInt(cameraId),
             "polygon_info": polygonInfo,
@@ -62,7 +73,6 @@ const DashboardCamCard = ({ cameraId }) => {
             .then((response) => {
                 // Handle the successful response here
                 console.log('Response data:', response.data);
-                showSuccessAlert();
             })
             .catch((error) => {
                 // Handle any errors that occurred during the request

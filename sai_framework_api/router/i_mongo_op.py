@@ -10,6 +10,10 @@ async def get_polygon():
     res = mongo_op.get_polygon()
     return res
 
+@router.get("/get_alert_counts")
+async def get_alert_counts():
+    res = mongo_op.get_alert_counts()
+    return res
 
 @router.post("/upsert_polygon")
 async def upsert_polygon(model:PolygonInfoSchemas):
@@ -17,3 +21,4 @@ async def upsert_polygon(model:PolygonInfoSchemas):
     polygon_info=json.loads(model.polygon_info)
     res = mongo_op.upsert_polygon(camera_no=camera_no, polygon_info=polygon_info)
     return res
+

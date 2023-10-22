@@ -96,6 +96,8 @@ async def working_fine_with_object_detection_get_stream(websocket: WebSocket, ca
         while True:
             try:
                 poly_info = database_data.get(camera_id)
+                poly_info = poly_info[:2]
+                danger_zone_poly= 1 if len(poly_info) > 1 else 0
                 # Get a frame from the buffer (frame skipping)
                 frame = frame_queue.get(timeout=1, block=True)  # Adjust the timeout as needed
                 frame_counter += 1
@@ -105,7 +107,7 @@ async def working_fine_with_object_detection_get_stream(websocket: WebSocket, ca
                 # Resize frame to a smaller resolution
                 frame = cv2.resize(frame, (820, 534))  # Adjust the resolution as needed
 
-                resized_frame = await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, camera_id,frame,poly_info)
+                resized_frame = await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, camera_id,frame,poly_info,danger_zone_poly)
             except Empty:
                 continue
             ret, buffer = cv2.imencode('.jpg', frame)
