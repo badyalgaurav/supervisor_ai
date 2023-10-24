@@ -21,11 +21,11 @@ const NavbarCamCard = (props) => {
     }
     const handleTaskClick = (cameraId) => {
         // Use the history object to navigate to the desired page
-        alert(cameraId)
+    
         const params = {
             cameraId: cameraId
         };
-        navigate('/alerteventsreport', { cameraId: params });
+        navigate('/alerteventsreport', { state: params });
     };
 
     return (<>

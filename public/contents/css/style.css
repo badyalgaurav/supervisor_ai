@@ -326,3 +326,32 @@ body {
 .navbar-card-body {
     overflow: auto;
 }
+
+
+
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: white;
+    padding: 0;
+}
+
+/* Update your CSS to remove the gap between header and content */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    text-align:center;
+    align-items: center;
+    background-color: #3a3a419e; /* Header background color */
+    color: white; /* Header text color */
+    border-bottom: 1px solid #ccc;
+}
+
+/* Adjust the margin to 0 to remove the gap */
+.modal-content {
+    margin: 0;
+    padding: 5px; /* Add some padding if needed */
+}

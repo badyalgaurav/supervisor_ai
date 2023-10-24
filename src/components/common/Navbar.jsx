@@ -12,7 +12,6 @@ const Navbar = (props) => {
             const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_alert_counts/`; 
             axios.get(apiUrl)
                 .then((response) => {
-                    debugger;
                     setData(response.data.data);
                 })
                 .catch((error) => {

@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import datetime
 import pandas as pd
 import json
-
+from dateutil import parser
 
 def GetClientUpdateByComapnyCode():
     serverAddress = "127.0.0.1:27017"
@@ -59,4 +59,19 @@ def get_alert_counts():
     return res
 
 
+def get_alert_details(camera_id:int,start_date:str,end_date:str):
+    start_date=parser.parse(start_date)
+    end_date=parser.parse(end_date)
+    res = {"data": None, "message": "MSG_100"}
+    client = GetClientUpdateByComapnyCode()
+    db = client["supervisorAI"]
+    coll = db["productionData"]
+    # start_date = datetime.datetime.strptime(datetime.datetime.now().date().strftime("%y-%m-%d %H:%M:%S"), '%y-%m-%d %H:%M:%S')
+    if start_date == end_date:
+        end_date = start_date + datetime.timedelta(days=1)
+
+    df = pd.DataFrame(list(coll.find({ 'startTime': {'$lt': end_date, '$gte': start_date},"cameraId":camera_id},{"_id":0})))
+    df = df.applymap(str)
+    res["data"] = json.loads(df.to_json(orient="records"))
+    return res
 
