@@ -26,22 +26,22 @@ const DashboardCamCard = ({ cameraId }) => {
     const [imageSrc, setImageSrc] = useState('');
 
 
-    useEffect(() => {
-        //handleGetPolygon(cameraId)
-        console.log("socket useeffect")
-        const socket = new WebSocket(`ws://localhost:8000/ws1/${cameraId}`);
+    //useEffect(() => {
+    //    //handleGetPolygon(cameraId)
+    //    console.log("socket useeffect")
+    //    const socket = new WebSocket(`ws://localhost:8000/ws1/${cameraId}`);
 
-        socket.binaryType = 'arraybuffer';
+    //    socket.binaryType = 'arraybuffer';
 
-        socket.onmessage = function (event) {
-            const imageUrl = URL.createObjectURL(new Blob([event.data], { type: 'image/jpeg' }));
-            setImageSrc(imageUrl);
-        };
+    //    socket.onmessage = function (event) {
+    //        const imageUrl = URL.createObjectURL(new Blob([event.data], { type: 'image/jpeg' }));
+    //        setImageSrc(imageUrl);
+    //    };
 
-        return () => {
-            socket.close();
-        };
-    }, [cameraId]);
+    //    return () => {
+    //        socket.close();
+    //    };
+    //}, [cameraId]);
     const showSuccessAlert = () => {
         Swal.fire({
             icon: "success",
@@ -104,7 +104,8 @@ const DashboardCamCard = ({ cameraId }) => {
                         cornerStyle: "circle",
                         cornerSize: 10,
                     }}>
-                    <div> <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "534px", width: "812px" }} /> </div>
+                    {/*<div> <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "534px", width: "812px" }} /> </div>*/}
+                    <div> <img src={`http://127.0.0.1:8000/video_feed?camera_id=${cameraId}`} alt={`Camera ${cameraId}`} style={{ height: "534px", width: "812px" }} /> </div>
                 </CanvasPolygons>
             </div>
         </div>

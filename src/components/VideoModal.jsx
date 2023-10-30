@@ -25,7 +25,10 @@ const VideoModal = ({ isOpen, videoUrl, onRequestClose }) => {
             <div className="modal-header">
                 <h6 className="align-items-center">Video</h6><button className="close-button" onClick={onRequestClose}>X</button></div>
             <div className="modal-content">
-                <video src={f_path} controls width="100%" height="100%" />
+                <video controls width="100%" height="100%">
+                    <source src={f_path} type="video/mp4"></source>
+                        Your browser does not support the video tag.
+                </video>
             </div>
         </Modal>
     );

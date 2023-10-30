@@ -51,5 +51,5 @@ def insert_events_db(camera_id, video_path, start_time, end_time):
     client = GetClientUpdateByComapnyCode()
     db = client["supervisorAI"]
     coll = db["productionData"]
-    coll.insert_one({"cameraId": camera_id, "videoPath": video_path, "startTime": start_time, "endTime": end_time})
+    coll.insert_one({"cameraId": camera_id, "videoPath": video_path, "startTime": start_time, "endTime": end_time,"fileSize":-1})
     return True

@@ -38,7 +38,7 @@ const AlertEventsReport = () => {
             cell: (row) => (
 
 
-                <button onClick={() => openModal(row.videoPath)}>Play Video</button>
+                <button className="btn btn-primary" onClick={() => openModal(row.videoPath)}><i className="fa fa-play"></i></button>
             ),
         },
     ];
@@ -106,6 +106,7 @@ const AlertEventsReport = () => {
                 <div>
 
                     <div style={{ display: 'flex', alignItems: 'center' }}>
+                    
                         <DatePicker
                             selectsRange={true}
                             startDate={startDate}
@@ -113,9 +114,11 @@ const AlertEventsReport = () => {
                             onChange={(update) => {
                                 setDateRange(update);
                             }}
+                            
                             dateFormat="yyyy/MM/dd"
-
-                        />
+                                className="custom-datepicker-input"
+                            />
+                      
                         <button type="button" class="btn btn-outline-info m-2" onClick={() => { handleGetData("test") }}><i class="fa fa-search me-2"></i>Search</button>
                         <button type="button" class="btn btn-outline-success m-2" onClick={() => { handleTaskClick("test") }}><i class="fa fa-home me-2"></i>Dashboard</button>
                     </div>

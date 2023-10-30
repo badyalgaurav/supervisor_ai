@@ -355,3 +355,18 @@ body {
     margin: 0;
     padding: 5px; /* Add some padding if needed */
 }
+
+
+/* DatePickerCustomStyles.css */
+
+
+
+.custom-datepicker-input {
+    /* You can adjust the height and padding as needed */
+    height: 100%;
+    padding: 10px;
+    font-size: 12px;
+    background: #3a3a419e;
+    color: white;
+    border:1px solid;
+}
