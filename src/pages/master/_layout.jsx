@@ -8,40 +8,22 @@ import { apiSAIFrameworkAPIPath, apiWebSocketPath } from "../../config"
 import { MainContextProvider } from "../../utils/MainContextProvider";
 const Layout = () => {
     //const initPolygonStatus = { "cam_1": false, "cam_2": false, "cam_3": false, "cam_4": false}
-    const [updatePolygonStatus, setUpdatePolygonStatus] = useState([false, false, false, false]);
+    const [enableEditingPolygonStatus, setEnableEditingPolygonStatus] = useState([false, false, false, false]);
     const [polygonInfo, setPolygonInfo] = useState([false, false, false, false]);
+    const [timeVal, setTimeVal] = useState([false, false, false, false]);
     const [savePolygonStatus, setSaveePolygonStatus] = useState([false, false, false, false]);
+    const [deleteActivePolygonStatus, setDeleteActivePolygonStatus] = useState([false, false, false, false]);
+    const [resetStatus, setResetStatus] = useState([false, false, false, false]);
+    const [addPolygonStatus, setAddPolygonStatus] = useState([false, false, false, false]);
+    const [addRecPolygonStatus, setAddRecPolygonStatus] = useState([false, false, false, false]);
     const [showSpinner, setShowSpinner] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleGetPolygon = (cameraId) => {
-        const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_polygon`; // Replace with your API endpoint URL
-        const requestData = {
-            // "camera_no": parseInt(cameraId)
 
-        };
-
-        axios.get(apiUrl, {
-            params: requestData
-        })
-            .then((response) => {
-                const responseData = response.data.data;
-                for (let i = 0; i < responseData.length; i++) {
-                    const item = responseData[i];
-                    localStorage.setItem(`polyFor_${item.camera_no}`, JSON.stringify(item.polygonInfo))
-                    // Process each item in the response data here
-                }
-            })
-            .catch((error) => {
-                // Handle any errors that occurred during the request
-                console.error('Error:', error);
-            });
-    }
 
     useEffect(() => {
         // Show the spinner initially
         setShowSpinner(true);
-        handleGetPolygon(3)
         // Set a timeout to hide the spinner after the delay
         const timeoutId = setTimeout(() => {
             setShowSpinner(false);
@@ -56,8 +38,8 @@ const Layout = () => {
     };
 
 
-    const updatePolygonStatusFn = (newValue, camNo) => {
-        setUpdatePolygonStatus(prevState => {
+    const enableEditingPolygonStatusFn = (newValue, camNo) => {
+        setEnableEditingPolygonStatus(prevState => {
             // Create a copy of the existing state array
             const currentPolygonStatus = [...prevState];
 
@@ -68,6 +50,7 @@ const Layout = () => {
             return currentPolygonStatus;
         });
     };
+
 
     const savePolygonStatusFn = (newValue, camNo) => {
         setSaveePolygonStatus(prevState => {
@@ -82,9 +65,80 @@ const Layout = () => {
         });
     };
 
+    const deleteActivePolygonStatusFn = (newValue, camNo) => {
+        setDeleteActivePolygonStatus(prevState => {
+            // Create a copy of the existing state array
+            const currentDeletePolygonStatus = [false, false, false, false];
+
+            // Update the copy with the new value at the specified index
+            currentDeletePolygonStatus[parseInt(camNo) - 1] = newValue;
+
+            // Return the modified copy as the new state
+            return currentDeletePolygonStatus;
+        });
+    };
+
+    const resetStatusFn = (newValue, camNo) => {
+        setResetStatus(prevState => {
+            // Create a copy of the existing state array
+            const currentResetStatus = [false, false, false, false];
+
+            // Update the copy with the new value at the specified index
+            currentResetStatus[parseInt(camNo) - 1] = newValue;
+
+            // Return the modified copy as the new state
+            return currentResetStatus;
+        });
+    };
+
+    const addPolygonStatusFn = (newValue, camNo) => {
+        setAddPolygonStatus(prevState => {
+            // Create a copy of the existing state array
+            const currentAddPolygonStatus = [false, false, false, false];
+
+            // Update the copy with the new value at the specified index
+            currentAddPolygonStatus[parseInt(camNo) - 1] = newValue;
+
+            // Return the modified copy as the new state
+            return currentAddPolygonStatus;
+        });
+    };
+    const addRecPolygonStatusFn = (newValue, camNo) => {
+        setAddRecPolygonStatus(prevState => {
+            // Create a copy of the existing state array
+            const currentAddRecPolygonStatus = [false, false, false, false];
+
+            // Update the copy with the new value at the specified index
+            currentAddRecPolygonStatus[parseInt(camNo) - 1] = newValue;
+
+            // Return the modified copy as the new state
+            return currentAddRecPolygonStatus;
+        });
+    };
+    //useEffect(() => {
+    //    // Show the spinner initially
+    //    setShowSpinner(true);
+    //    handleGetPolygon(3)
+    //    // Set a timeout to hide the spinner after the delay
+    //    const timeoutId = setTimeout(() => {
+    //        setShowSpinner(false);
+    //    }, 1);
+
+    //    // Clean up the timeout when the component unmounts or when the effect is re-run
+    //    return () => clearTimeout(timeoutId);
+    //}, []); 
     return (
         <div>
-            <MainContextProvider.Provider value={{ updatePolygonStatus, updatePolygonStatusFn, savePolygonStatus, savePolygonStatusFn, polygonInfo }}>
+            <MainContextProvider.Provider value={{
+                enableEditingPolygonStatus,  enableEditingPolygonStatusFn,
+                savePolygonStatus, savePolygonStatusFn,
+                deleteActivePolygonStatus, deleteActivePolygonStatusFn,
+                resetStatus, resetStatusFn,
+                addPolygonStatus, addPolygonStatusFn,
+                addRecPolygonStatus, addRecPolygonStatusFn,
+                polygonInfo,
+                timeVal, setTimeVal
+            }}>
                 <div class="container-fluid position-relative d-flex p-0">
                     {/*<!-- Spinner Start -->*/}
                     <div
@@ -103,7 +157,6 @@ const Layout = () => {
                         {/*<Header toggleSidebar={toggleSidebar} />*/}
 
                         <div class="">
-
                             <div class="container-fluid px-2">
                                 <Outlet />
                             </div>

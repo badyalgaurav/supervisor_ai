@@ -29,11 +29,17 @@ async def get_alert_details(camera_id: int, start_date: str, end_date: str):
 async def upsert_polygon(model: PolygonInfoSchemas):
     camera_no = model.camera_no
     polygon_info = json.loads(model.polygon_info)
-    res = mongo_op.upsert_polygon(camera_no=camera_no, polygon_info=polygon_info)
+    res = mongo_op.upsert_polygon(camera_no=camera_no, polygon_info=polygon_info,start_time=model.start_time,end_time=model.end_time)
     return res
+
 
 @router.get("/video")
 async def get_video(video_path):
     # Replace 'path_to_video.mp4' with the actual path to your video file.
     # video_path = "/var/www/camera_3_939715_video.mp4"
     return FileResponse(video_path, media_type="video/mp4")
+
+@router.get("/get_time_data")
+async def get_time_data():
+    res = mongo_op.get_time_data()
+    return res

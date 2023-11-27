@@ -25,13 +25,16 @@ classNames = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "trai
 
 # polygon
 IS_PERSON_IN_DANGER = {1: False, 2: False, 3: False, 4: False}
+IS_PERSON_IN_WARNING = {1: False, 2: False, 3: False, 4: False}
+IS_PERSON_REMAIN_IN_WARNING = {1: False, 2: False, 3: False, 4: False}
 IS_PERSON_REMAIN_IN_DANGER = {1: False, 2: False, 3: False, 4: False}
+
 FRAME_H_BOX = {1: [], 2: [], 3: [], 4: []}
 IS_PERSON_REMAIN_IN_DANGER_START_TIME = {1: "", 2: "", 3: "", 4: ""}
 
 # Video recording variables
 # Define a dictionary to store frame buffers for each camera
-camera_frames = {1: [], 2: [], 3: [], 4: []}
+CAMERA_FRAMES = {1: [], 2: [], 3: [], 4: []}
 
 
 def insert_event(camera_id, video_path, start_time, end_time):
@@ -42,7 +45,7 @@ def insert_event(camera_id, video_path, start_time, end_time):
 # Function to record video in the danger zone
 def record_video(camera_id, video_path):
     try:
-        frames = camera_frames[camera_id]
+        frames = CAMERA_FRAMES[camera_id]
         frame_height, frame_width, _ = frames[0].shape
         # fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec for MP4 format\
         fourcc = cv2.VideoWriter_fourcc(*'h264')
@@ -50,68 +53,75 @@ def record_video(camera_id, video_path):
         for frame in frames:
             out.write(frame)
         out.release()
-        camera_frames[camera_id] = []
+        CAMERA_FRAMES[camera_id] = []
         # Get the size of the video file
     except Exception as e:
         # Code to handle the exception (generic)
         print("An exception occurred:", e)
-        out.release()
-        camera_frames[camera_id] = []
 
 
-def detect_yolo_person_in_polygon(camera_id, img, poly_info, danger_zone_poly):
+def detect_yolo_person_in_polygon(camera_id, img, poly_info, rec_poly_info):
     global IS_PERSON_IN_DANGER
     global IS_PERSON_REMAIN_IN_DANGER
     global IS_PERSON_REMAIN_IN_DANGER_START_TIME
-    global camera_frames
+    global CAMERA_FRAMES
     global FRAME_H_BOX
 
-    results = model(img, stream=True, classes=0, conf=CONFIDENCE_THRESHOLD,imgsz=320)
+    results = model(img, stream=True, classes=0, conf=CONFIDENCE_THRESHOLD, imgsz=320)
     IS_PERSON_IN_DANGER[camera_id] = False
+    IS_PERSON_IN_WARNING[camera_id] = False
     # reset frame save
     FRAME_H_BOX[camera_id] = []
 
     for r in results:
         boxes = r.boxes
         FRAME_H_BOX[camera_id].append(boxes)
-        draw_rect(camera_id, danger_zone_poly, poly_info, img, boxes)
+        draw_rect(camera_id, poly_info, img, boxes, rec_poly_info)
     return img
 
 
-def from_box_person_in_polygon(camera_id, img, poly_info, danger_zone_poly):
+def from_box_person_in_polygon(camera_id, img, poly_info, rec_poly_info):
     try:
         if FRAME_H_BOX[camera_id]:
             for boxes in FRAME_H_BOX[camera_id]:
-                draw_rect(camera_id,danger_zone_poly,poly_info,img, boxes)
+                draw_rect(camera_id, poly_info, img, boxes, rec_poly_info)
     except Exception as e:
         print(f'{e}')
     return img
 
 
-def draw_rect(camera_id,danger_zone_poly,poly_info,img,boxes):
-    # frame_copied = img.copy()
+def draw_rect(camera_id, poly_info, img, boxes, rec_poly_info):
+    frame_copied = img.copy()
     try:
 
         for box in boxes:
             x1, y1, x2, y2 = box.xyxy[0]
             x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+            if any(cv2.pointPolygonTest(rec_poly_info, (x1, y1), False) >= 0 for x1, y1 in [(x1, y1), (x2, y1), (x2, y2), (x1, y2)]):
+                # if i == danger_zone_poly:
+                IS_PERSON_IN_WARNING[camera_id] = True
+                # Draw bounding box and other details (Orange color)
+                cv2.rectangle(img, (x1, y1), (x2, y2), (0,255,255), 3)
+            else:
+                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+
             for i, polygon_points in enumerate(poly_info):
                 # Check if any part of the person's bounding box intersects with the polygon
                 if any(cv2.pointPolygonTest(polygon_points, (x1, y1), False) >= 0 for x1, y1 in [(x1, y1), (x2, y1), (x2, y2), (x1, y2)]):
-                    if i == danger_zone_poly:
-                        IS_PERSON_IN_DANGER[camera_id] = True
+                    # if i == danger_zone_poly:
+                    IS_PERSON_IN_DANGER[camera_id] = True
                     # Draw bounding box and other details
                     cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 3)
-                else:
-                    cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
 
-        if IS_PERSON_IN_DANGER[camera_id]:
+        if IS_PERSON_IN_WARNING[camera_id]:
             # full if  block is for video recording
             if not IS_PERSON_REMAIN_IN_DANGER[camera_id]:
                 IS_PERSON_REMAIN_IN_DANGER[camera_id] = True
                 IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = datetime.datetime.now()
-                start_camera_alert(camera_id=camera_id)
-            camera_frames[camera_id].append(img)
+                if IS_PERSON_IN_DANGER[camera_id]:
+                    start_camera_alert(camera_id=camera_id)
+            CAMERA_FRAMES[camera_id].append(frame_copied)
 
         else:
             # full if  block is for video recording
@@ -125,7 +135,8 @@ def draw_rect(camera_id,danger_zone_poly,poly_info,img,boxes):
                              start_time=IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id], end_time=end_time)
                 IS_PERSON_REMAIN_IN_DANGER[camera_id] = False
                 IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = ""
-                stop_camera_alert(camera_id=camera_id)
+                if not IS_PERSON_IN_DANGER[camera_id]:
+                    stop_camera_alert(camera_id=camera_id)
                 # print("no person not in danger zone")
     except:
         print("error")

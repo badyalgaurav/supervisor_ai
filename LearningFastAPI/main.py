@@ -30,7 +30,7 @@ async def fetch_data_periodically():
         global database_data
         database_data = new_data
         # Sleep for 5 minutes before checking again
-        await asyncio.sleep(300)  # 300 seconds = 5 minutes
+        await asyncio.sleep(120)  # 300 seconds = 5 minutes
 
 
 @app.on_event("startup")
@@ -58,32 +58,31 @@ frame_counters = {1: 0, 2: 0, 3: 0, 4: 0}
 thread_termination_flags = {1: False, 2: False, 3: False, 4: False}
 
 
-
 async def generate_frames(camera_id):
     try:
         while not thread_termination_flags[camera_id]:
             frame = camera_streams[camera_id].read()
-            frame = imutils.resize(frame, width=820, height=534)
+            frame = imutils.resize(frame, width=812, height=534)
 
             if frame is not None:
                 frame_counters[camera_id] += 1
-                poly_info = database_data.get(camera_id)
-                poly_info = poly_info[:2]
-                danger_zone_poly = 1 if len(poly_info) > 1 else 0
-                if frame_counters[camera_id] % 7 == 0:
-                    await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, camera_id, frame, poly_info, danger_zone_poly)
+                poly_info = database_data.get(camera_id).get("polygon_list")
+                rec_poly_info = database_data.get(camera_id).get("recPoly_dict")
+                if frame_counters[camera_id] % 10 == 0:
+                    await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, camera_id, frame, poly_info,rec_poly_info)
                     frame_counters[camera_id] = 0
                 else:
-                    await asyncio.to_thread(human_detection.from_box_person_in_polygon, camera_id, frame, poly_info, danger_zone_poly)
+                    await asyncio.to_thread(human_detection.from_box_person_in_polygon, camera_id, frame, poly_info,rec_poly_info)
                 _, buffer = cv2.imencode(".jpg", frame)
                 frame_bytes = buffer.tobytes()
                 yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-
     except:
         pass  # Handle exceptions as needed
 
+
 def stop_stream(camera_id):
     camera_streams[camera_id].stop()
+
 
 @app.on_event("shutdown")
 def stop_streams():
@@ -92,6 +91,7 @@ def stop_streams():
         thread_termination_flags[camera_id] = True
         stop_stream(camera_id)
 
+
 @app.get("/video_feed")
 async def video_feed(camera_id: int):
     if camera_id in camera_streams:
@@ -99,6 +99,7 @@ async def video_feed(camera_id: int):
         return StreamingResponse(generate_frames(camera_id), media_type="multipart/x-mixed-replace;boundary=frame")
     else:
         return "Camera not found"
+
 
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0", port=8000, access_log=False)

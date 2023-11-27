@@ -5,11 +5,12 @@ import { apiSAIFrameworkAPIPath } from "../../config"
 const Navbar = (props) => {
 
     const [data, setData] = useState("");
+    const [timeData, setTimeData] = useState("");
 
     useEffect(() => {
         // Function to make an Axios request
         const fetchData = () => {
-            const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_alert_counts/`; 
+            const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_alert_counts/`;
             axios.get(apiUrl)
                 .then((response) => {
                     setData(response.data.data);
@@ -18,14 +19,24 @@ const Navbar = (props) => {
                     console.error('Error fetching data:', error);
                 });
         };
+        const getTimeData = () => {
+            const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_time_data/`;
+            axios.get(apiUrl)
+                .then((response) => {
+                    setTimeData(response.data.data);
+                })
+                .catch((error) => {
+                    console.error('Error fetching data:', error);
+                });
+        };
 
         // Initial request when the component mounts
         fetchData();
-
+        getTimeData();
         // Set up a recurring request every one minute (60000 milliseconds)
         const interval = setInterval(() => {
             fetchData();
-        }, 10*1000);
+        }, 10 * 1000);
 
         // Clear the interval when the component is unmounted to prevent memory leaks
         return () => {
@@ -45,17 +56,17 @@ const Navbar = (props) => {
                     <div class="navbar-nav w-100">
                         <div class="nav-item dropdown">
                             <div className="">
-                                <NavbarCamCard camNo={"1"} data={data}></NavbarCamCard>
+                                <NavbarCamCard camNo={"1"} data={data} timeData={timeData}></NavbarCamCard>
                             </div>
 
                             <div className="">
-                                <NavbarCamCard camNo={"2"} data={data}></NavbarCamCard>
+                                <NavbarCamCard camNo={"2"} data={data} timeData={timeData}></NavbarCamCard>
                             </div>
                             <div className="">
-                                <NavbarCamCard camNo={"3"} data={data}></NavbarCamCard>
+                                <NavbarCamCard camNo={"3"} data={data} timeData={timeData}></NavbarCamCard>
                             </div>
                             <div className="">
-                                <NavbarCamCard camNo={"4"} data={data}></NavbarCamCard>
+                                <NavbarCamCard camNo={"4"} data={data} timeData={timeData}></NavbarCamCard>
                             </div>
                         </div>
                     </div>

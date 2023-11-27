@@ -36,12 +36,16 @@ def get_all_polygon():
 
     for index, row in df.iterrows():
         polygon_list = []
+        recPoly_dict ={}
         for polygon in row["polygonInfo"]:
             result = [(item['x'], item['y']) for item in polygon.get("polygon")]
             result = np.array(result, dtype=np.int32)
             result = result.reshape((-1, 1, 2))
-            polygon_list.append(result)
-        response[row.get("camera_no")] = polygon_list
+            if polygon.get("label") == "recPoly":
+                recPoly_dict=result
+            else:
+                polygon_list.append(result)
+        response[row.get("camera_no")] = {"polygon_list":polygon_list,"recPoly_dict":recPoly_dict}
 
     print("successfully data loaded")
     return response
