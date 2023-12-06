@@ -16,16 +16,13 @@ def upsert_polygon(polygon_info: str, camera_no: int, start_time: Optional[str] 
     client = GetClientUpdateByComapnyCode()
     db = client["supervisorAI"]
     coll = db["polygonInfo"]
-
-    # to add the top and left with y and x points
-    # for poly in polygon_info:
-    #     for points in poly.get("points"):
-    #         points["x"]=poly.get("left")+points.get("x")
-    #         points["y"]=poly.get("top")+points.get("y")
+    coll_logs = db["polygonLogs"]
 
     coll.update_one({"camera_no": camera_no},
                     {"$set": {"polygonInfo": [{"polygon": poly.get("transformedPoints"), "label": poly.get("name")} for poly in polygon_info], "camera_no": camera_no, "polyRawInfo": polygon_info,
                               "startTime": start_time, "endTime": end_time}}, upsert=True)
+    coll_logs.insert_one({"polygonInfo": [{"polygon": poly.get("transformedPoints"), "label": poly.get("name")} for poly in polygon_info], "camera_no": camera_no, "polyRawInfo": polygon_info,
+                          "startTime": start_time, "endTime": end_time, "createdDateTime": datetime.datetime.now()})
     return True
 
 
@@ -44,7 +41,7 @@ def get_alert_counts():
     client = GetClientUpdateByComapnyCode()
     db = client["supervisorAI"]
     coll = db["productionData"]
-    start_date = datetime.datetime.strptime(datetime.datetime.now().date().strftime("%y-%m-%d %H:%M:%S"), '%y-%m-%d %H:%M:%S')- datetime.timedelta(days=3)
+    start_date = datetime.datetime.strptime(datetime.datetime.now().date().strftime("%y-%m-%d %H:%M:%S"), '%y-%m-%d %H:%M:%S') - datetime.timedelta(days=3)
     end_date = start_date + datetime.timedelta(days=5)
     # Perform the aggregation
     pipeline = [

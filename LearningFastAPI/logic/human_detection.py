@@ -28,6 +28,9 @@ IS_PERSON_IN_DANGER = {1: False, 2: False, 3: False, 4: False}
 IS_PERSON_IN_WARNING = {1: False, 2: False, 3: False, 4: False}
 IS_PERSON_REMAIN_IN_WARNING = {1: False, 2: False, 3: False, 4: False}
 IS_PERSON_REMAIN_IN_DANGER = {1: False, 2: False, 3: False, 4: False}
+# Initialize a dictionary to track the state of each camera
+# 0: Not in danger zone, 1: In danger zone
+PERSON_STATE = {camera_id: 0 for camera_id in [1,2,3,4]}
 
 FRAME_H_BOX = {1: [], 2: [], 3: [], 4: []}
 IS_PERSON_REMAIN_IN_DANGER_START_TIME = {1: "", 2: "", 3: "", 4: ""}
@@ -102,7 +105,7 @@ def draw_rect(camera_id, poly_info, img, boxes, rec_poly_info):
                 # if i == danger_zone_poly:
                 IS_PERSON_IN_WARNING[camera_id] = True
                 # Draw bounding box and other details (Orange color)
-                cv2.rectangle(img, (x1, y1), (x2, y2), (0,255,255), 3)
+                cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 255), 3)
             else:
                 cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
 
@@ -113,31 +116,88 @@ def draw_rect(camera_id, poly_info, img, boxes, rec_poly_info):
                     IS_PERSON_IN_DANGER[camera_id] = True
                     # Draw bounding box and other details
                     cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 3)
+        # Usage
+        process_frame(camera_id, img)
 
-        if IS_PERSON_IN_WARNING[camera_id]:
-            # full if  block is for video recording
-            if not IS_PERSON_REMAIN_IN_DANGER[camera_id]:
-                IS_PERSON_REMAIN_IN_DANGER[camera_id] = True
-                IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = datetime.datetime.now()
-                if IS_PERSON_IN_DANGER[camera_id]:
-                    start_camera_alert(camera_id=camera_id)
-            CAMERA_FRAMES[camera_id].append(frame_copied)
-
-        else:
-            # full if  block is for video recording
-            if IS_PERSON_REMAIN_IN_DANGER[camera_id]:
-                end_time = datetime.datetime.now()
-                video_path = f"/var/www/camera_{camera_id}_{datetime.datetime.utcnow().microsecond}_video.mp4"
-                recording_thread = threading.Thread(target=record_video, args=(camera_id, video_path))
-                recording_thread.daemon = True
-                recording_thread.start()
-                insert_event(camera_id=camera_id, video_path=video_path,
-                             start_time=IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id], end_time=end_time)
-                IS_PERSON_REMAIN_IN_DANGER[camera_id] = False
-                IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = ""
-                if not IS_PERSON_IN_DANGER[camera_id]:
-                    stop_camera_alert(camera_id=camera_id)
-                # print("no person not in danger zone")
+        # if IS_PERSON_IN_WARNING[camera_id]:
+        #     # full if  block is for video recording
+        #     if not IS_PERSON_REMAIN_IN_DANGER[camera_id]:
+        #         IS_PERSON_REMAIN_IN_DANGER[camera_id] = True
+        #         IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = datetime.datetime.now()
+        #         if IS_PERSON_IN_DANGER[camera_id]:
+        #             start_camera_alert(camera_id=camera_id)
+        #     CAMERA_FRAMES[camera_id].append(frame_copied)
+        #
+        # else:
+        #     # full if  block is for video recording
+        #     if IS_PERSON_REMAIN_IN_DANGER[camera_id]:
+        #         end_time = datetime.datetime.now()
+        #         video_path = f"/var/www/camera_{camera_id}_{datetime.datetime.utcnow().microsecond}_video.mp4"
+        #         recording_thread = threading.Thread(target=record_video, args=(camera_id, video_path))
+        #         recording_thread.daemon = True
+        #         recording_thread.start()
+        #         insert_event(camera_id=camera_id, video_path=video_path,
+        #                      start_time=IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id], end_time=end_time)
+        #         IS_PERSON_REMAIN_IN_DANGER[camera_id] = False
+        #         IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = ""
+        #         if not IS_PERSON_IN_DANGER[camera_id]:
+        #             stop_camera_alert(camera_id=camera_id)
+        #         # print("no person not in danger zone")
     except:
         print("error")
     return img
+
+
+def process_frame(camera_id, frame):
+    # Check if the person is in danger zone
+    if IS_PERSON_IN_DANGER[camera_id]:
+        handle_person_in_danger(camera_id)
+    else:
+        handle_person_not_in_danger(camera_id)
+
+    # full if block is for video recording
+    if IS_PERSON_IN_WARNING[camera_id]:
+        handle_person_in_warning(camera_id, frame)
+    else:
+        handle_person_not_in_warning(camera_id, frame)
+
+def handle_person_in_danger(camera_id):
+    # Check if the person has just entered the danger zone
+    if PERSON_STATE[camera_id] == 0:
+        start_camera_alert(camera_id=camera_id)
+        PERSON_STATE[camera_id] = 1  # Update state to indicate person is in danger zone
+        print(f"Person entered danger zone in Camera {camera_id}")
+    # else: Person is already in danger zone, do nothing
+
+def handle_person_not_in_danger(camera_id):
+    # Check if the person has just left the danger zone
+    if PERSON_STATE[camera_id] == 1:
+        stop_camera_alert(camera_id=camera_id)
+        PERSON_STATE[camera_id] = 0  # Update state to indicate person is not in danger zone
+        print(f"Person left danger zone in Camera {camera_id}")
+    # else: Person is already not in danger zone, do nothing
+
+def handle_person_in_warning(camera_id, frame):
+    # full if block is for video recording
+    if not IS_PERSON_REMAIN_IN_DANGER[camera_id]:
+        IS_PERSON_REMAIN_IN_DANGER[camera_id] = True
+        IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = datetime.datetime.now()
+        # if IS_PERSON_IN_DANGER[camera_id]:
+        #     start_camera_alert(camera_id=camera_id)
+    CAMERA_FRAMES[camera_id].append(frame.copy())
+
+
+def handle_person_not_in_warning(camera_id, frame):
+    # full if block is for video recording
+    if IS_PERSON_REMAIN_IN_DANGER[camera_id]:
+        end_time = datetime.datetime.now()
+        video_path = f"/var/www/camera_{camera_id}_{datetime.datetime.utcnow().microsecond}_video.mp4"
+        recording_thread = threading.Thread(target=record_video, args=(camera_id, video_path))
+        recording_thread.daemon = True
+        recording_thread.start()
+        insert_event(camera_id=camera_id, video_path=video_path,
+                     start_time=IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id], end_time=end_time)
+        IS_PERSON_REMAIN_IN_DANGER[camera_id] = False
+        IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = ""
+        # if not IS_PERSON_IN_DANGER[camera_id]:
+        #     stop_camera_alert(camera_id=camera_id)

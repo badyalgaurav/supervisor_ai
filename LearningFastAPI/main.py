@@ -8,7 +8,7 @@ import imutils
 from imutils.video import VideoStream
 from logic import human_detection
 from logic.mongo_op import get_all_polygon
-
+# import signal
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -35,6 +35,7 @@ async def fetch_data_periodically():
 
 @app.on_event("startup")
 async def startup_event():
+    # signal.signal(signal.SIGINT, stop_stream)
     # Start the background task to fetch data periodically
     asyncio.create_task(fetch_data_periodically())
 
@@ -62,9 +63,8 @@ async def generate_frames(camera_id):
     try:
         while not thread_termination_flags[camera_id]:
             frame = camera_streams[camera_id].read()
-            frame = imutils.resize(frame, width=812, height=534)
-
             if frame is not None:
+                frame = imutils.resize(frame, width=812, height=534)
                 frame_counters[camera_id] += 1
                 poly_info = database_data.get(camera_id).get("polygon_list")
                 rec_poly_info = database_data.get(camera_id).get("recPoly_dict")
@@ -80,17 +80,23 @@ async def generate_frames(camera_id):
         pass  # Handle exceptions as needed
 
 
+# def stop_stream(*args):
+    # for camera_id in camera_streams:
+    #     thread_termination_flags[camera_id] = True
+    #     # stop_stream(camera_id)
+    #     camera_streams[camera_id].stop()
+    #     print(f"stopped camera process {camera_id}")
+
 def stop_stream(camera_id):
-    camera_streams[camera_id].stop()
-
-
+        camera_streams[camera_id].stop()
+        print(f"stopped camera process {camera_id}")
 @app.on_event("shutdown")
-def stop_streams():
+def shutdown_event():
     # Release all camera streams on server shutdown
     for camera_id in camera_streams:
         thread_termination_flags[camera_id] = True
         stop_stream(camera_id)
-
+    print("successfully data terminated")
 
 @app.get("/video_feed")
 async def video_feed(camera_id: int):
