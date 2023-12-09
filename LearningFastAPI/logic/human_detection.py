@@ -201,3 +201,4 @@ def handle_person_not_in_warning(camera_id, frame):
         IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = ""
         # if not IS_PERSON_IN_DANGER[camera_id]:
         #     stop_camera_alert(camera_id=camera_id)
+
