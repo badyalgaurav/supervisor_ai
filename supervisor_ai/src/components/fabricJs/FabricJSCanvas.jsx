@@ -32,6 +32,7 @@ const FabricJSCanvas = (props) => {
             params: requestData
         })
             .then((response) => {
+                debugger;
                 const responseData = response.data.data;
                 for (let i = 0; i < responseData.length; i++) {
                     const item = responseData[i];

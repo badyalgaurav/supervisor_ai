@@ -72,8 +72,8 @@ const NavbarCamCard = (props) => {
     };
 
     useEffect(() => {
-        let sDate = timeData ? timeData[camNo]["startTime"] : "00:00";
-        let eDate = timeData ? timeData[camNo]["endTime"] : "00:00";
+        let sDate = timeData?.[camNo]?.startTime || "00:00";
+        let eDate = timeData?.[camNo]?.startTime || "00:00";
         setStartTime(sDate);
         setEndTime(eDate);
     }, [props.timeData])

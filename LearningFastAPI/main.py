@@ -56,9 +56,9 @@ url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
 # Create VideoStream instances for each camera
 camera_streams = {
     1: VideoStream(url_rtsp_1).start(),
-    2: VideoStream(url_rtsp_2).start(),
-    3: VideoStream(url_rtsp_3).start(),
-    4: VideoStream(url_rtsp_4).start(),
+    # 2: VideoStream(url_rtsp_2).start(),
+    # 3: VideoStream(url_rtsp_3).start(),
+    # 4: VideoStream(url_rtsp_4).start(),
 }
 
 frame_counters = {1: 0, 2: 0, 3: 0, 4: 0}
