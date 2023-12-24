@@ -6,10 +6,9 @@ import uvicorn
 import asyncio
 import imutils
 from imutils.video import VideoStream
-# from logic import human_detection
+from logic import human_detection
 from logic.human_detection_class import CameraProcessor
 from logic.mongo_op import get_all_polygon, get_camera_settings
-import time
 
 # import signal
 app = FastAPI()
@@ -68,12 +67,32 @@ frame_counters = {1: 0, 2: 0, 3: 0, 4: 0}
 thread_termination_flags = {1: False, 2: False, 3: False, 4: False}
 
 
+# WORKING FINE
+# async def generate_frames(camera_id):
+#
+#     try:
+#         while not thread_termination_flags[camera_id]:
+#             frame = camera_streams[camera_id].read()
+#             if frame is not None:
+#                 frame = imutils.resize(frame, width=812, height=534)
+#                 frame_counters[camera_id] += 1
+#                 poly_info = database_data.get(camera_id).get("polygon_list")
+#                 rec_poly_info = database_data.get(camera_id).get("recPoly_dict")
+#                 if frame_counters[camera_id] % 10 == 0:
+#                     await asyncio.to_thread(human_detection.detect_yolo_person_in_polygon, camera_id, frame, poly_info, rec_poly_info)
+#                     frame_counters[camera_id] = 0
+#                 else:
+#                     await asyncio.to_thread(human_detection.from_box_person_in_polygon, camera_id, frame, poly_info, rec_poly_info)
+#                 _, buffer = cv2.imencode(".jpg", frame)
+#                 frame_bytes = buffer.tobytes()
+#                 yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+#     except:
+#         pass  # Handle exceptions as needed
+
+
 # FOR CLASS SOLUTION
 async def generate_frames(camera_id):
     camera_processor = CameraProcessor(camera_id)
-    start_time = time.time()
-    duration_per_file = 300  # 5 minutes in seconds
-    frames_to_write = []
 
     try:
         while not thread_termination_flags[camera_id]:
@@ -90,21 +109,11 @@ async def generate_frames(camera_id):
                 else:
                     await asyncio.to_thread(camera_processor.from_box_person_in_polygon, frame, poly_info, rec_poly_info)
 
-                # Yield frame for streaming response
                 _, buffer = cv2.imencode(".jpg", frame)
                 frame_bytes = buffer.tobytes()
                 yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-
-                # Asynchronously write frame to disk
-                await camera_processor.write_frame_to_disk(frame.copy())
-
-    except Exception as e:
-        print(f"Exception: {e}")
-        pass
-    finally:
-        # Release the VideoWriter when the thread terminates
-        if camera_processor.video_writer is not None:
-            camera_processor.video_writer.release()
+    except:
+        pass  # Handle exceptions as needed
 
 
 @app.get("/video_feed")

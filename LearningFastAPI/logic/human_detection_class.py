@@ -1,20 +1,27 @@
-
 ##########################RnD##############################################
+import asyncio
 import datetime
 import threading
 import cv2
+import numpy as np
 from ultralytics import YOLO
 from logic.alarm import start_camera_alert, stop_camera_alert
 from logic.mongo_op import insert_events_db
+
 yolo_model = YOLO("/logic/yolov8n.pt")
 class_names = ["person"]  # (list of class names)
 confidence_threshold = 0.60
+
+
 class CameraProcessor:
     def __init__(self, camera_id):
+        self.video_writer = None
+        self.start_time = None
+        self.duration_per_file = 300  # 5 minutes in seconds
+
+
         self.camera_id = camera_id
         self.model = yolo_model
-
-
 
         # Polygon and camera state initialization
         self.is_person_in_danger = False
@@ -131,12 +138,38 @@ class CameraProcessor:
         insert_events_db(self.camera_id, video_path, self.is_person_remain_in_danger_start_time, end_time)
         return "success"
 
-# Example usage
-# camera_processor_1 = CameraProcessor(camera_id=1)
-# camera_processor_2 = CameraProcessor(camera_id=2)
+    async def write_frame_to_disk(self, frame):
+        _, buffer = cv2.imencode(".jpg", frame)
+        frame_bytes = buffer.tobytes()
 
-# Call these methods as needed
-# camera_processor_1.detect_person_in_polygon(...)
-# camera_processor_1.draw_rect(...)
-# camera_processor_2.detect_person_in_polygon(...)
-# camera_processor_2.draw_rect(...)
+        # Asynchronously write the frame to disk
+        await asyncio.to_thread(self._write_frame_to_disk_async, frame_bytes)
+
+    def _write_frame_to_disk_async(self, frame_bytes):
+        # Check if a new video file needs to be created
+        current_time = datetime.time.time()
+        if self.start_time is None or current_time - self.start_time >= self.duration_per_file:
+            # Close the existing VideoWriter if it exists
+            if self.video_writer is not None:
+                self.video_writer.release()
+
+            # Create a new video file
+            current_datetime = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            video_filename = f"output_camera_{self.camera_id}_{current_datetime}.avi"
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')  # Adjust codec as needed
+            fps = 25  # Adjust frames per second as needed
+            frame_size = (640, 480)  # Adjust frame size as needed
+
+            self.video_writer = cv2.VideoWriter(video_filename, fourcc, fps, frame_size)
+            self.start_time = current_time
+
+        # Convert frame_bytes back to a frame
+        frame = cv2.imdecode(np.frombuffer(frame_bytes, dtype=np.uint8), cv2.IMREAD_COLOR)
+
+        # Write the frame to the video file
+        self.video_writer.write(frame)
+
+    def release_video_writer(self):
+        if self.video_writer is not None:
+            self.video_writer.release()
+            self.video_writer = None
