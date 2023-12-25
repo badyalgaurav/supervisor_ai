@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import cv2
@@ -7,6 +7,8 @@ import asyncio
 import imutils
 from imutils.video import VideoStream
 # from logic import human_detection
+# from fastapi import BackgroundTasks
+
 from logic.human_detection_class import CameraProcessor
 from logic.mongo_op import get_all_polygon, get_camera_settings
 import time
@@ -57,9 +59,9 @@ url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
 # Create VideoStream instances for each camera
 camera_streams = {
     1: VideoStream(url_rtsp_1).start(),
-    # 2: VideoStream(url_rtsp_2).start(),
-    # 3: VideoStream(url_rtsp_3).start(),
-    # 4: VideoStream(url_rtsp_4).start(),
+    2: VideoStream(url_rtsp_2).start(),
+    3: VideoStream(url_rtsp_3).start(),
+    4: VideoStream(url_rtsp_4).start(),
 }
 
 frame_counters = {1: 0, 2: 0, 3: 0, 4: 0}
@@ -69,15 +71,13 @@ thread_termination_flags = {1: False, 2: False, 3: False, 4: False}
 
 
 # FOR CLASS SOLUTION
-async def generate_frames(camera_id):
+async def generate_frames(camera_id, background_tasks: BackgroundTasks):
     camera_processor = CameraProcessor(camera_id)
-    start_time = time.time()
-    duration_per_file = 300  # 5 minutes in seconds
-    frames_to_write = []
-
+    # camera_processor.start_video_writer()
     try:
         while not thread_termination_flags[camera_id]:
             frame = camera_streams[camera_id].read()
+
             if frame is not None:
                 frame = imutils.resize(frame, width=812, height=534)
                 frame_counters[camera_id] += 1
@@ -94,24 +94,22 @@ async def generate_frames(camera_id):
                 _, buffer = cv2.imencode(".jpg", frame)
                 frame_bytes = buffer.tobytes()
                 yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+                camera_processor.write_frame_to_disk_async(frame)
 
-                # Asynchronously write frame to disk
-                await camera_processor.write_frame_to_disk(frame.copy())
 
     except Exception as e:
         print(f"Exception: {e}")
         pass
     finally:
-        # Release the VideoWriter when the thread terminates
-        if camera_processor.video_writer is not None:
-            camera_processor.video_writer.release()
+        # Asynchronously release the video writer
+        await asyncio.to_thread(camera_processor.release_video_writer)
 
 
 @app.get("/video_feed")
-async def video_feed(camera_id: int):
+async def video_feed(camera_id: int, background_tasks: BackgroundTasks):
     if camera_id in camera_streams:
         # thread_termination_flags[camera_id] = False  # Reset the termination flag
-        return StreamingResponse(generate_frames(camera_id), media_type="multipart/x-mixed-replace;boundary=frame")
+        return StreamingResponse(generate_frames(camera_id, background_tasks), media_type="multipart/x-mixed-replace;boundary=frame")
     else:
         return "Camera not found"
 

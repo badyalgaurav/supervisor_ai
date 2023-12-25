@@ -38,6 +38,7 @@ async def upsert_polygon(model: PolygonInfoSchemas):
 async def get_video(video_path):
     # Replace 'path_to_video.mp4' with the actual path to your video file.
     # video_path = "/var/www/camera_3_939715_video.mp4"
+    # return FileResponse(video_path, media_type="video/mp4")
     return FileResponse(video_path, media_type="video/mp4")
 
 @router.get("/get_time_data")
