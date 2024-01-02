@@ -1,11 +1,30 @@
-// VideoModal.js
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { apiSAIFrameworkAPIPath } from "../config"
+import { apiSAIFrameworkAPIPath } from "../config";
 Modal.setAppElement('#root');
 
 const VideoModal = ({ isOpen, videoUrl, onRequestClose }) => {
-    const f_path = `${apiSAIFrameworkAPIPath}/mongo_op/video/?video_path=${videoUrl}`
+    const [isVideoReady, setIsVideoReady] = useState(false);
+    const [isVideoAvailable, setIsVideoAvailable] = useState(true);
+    const videoRef = useRef(null);
+
+    const f_path = `${apiSAIFrameworkAPIPath}/mongo_op/video/?video_path=${videoUrl}`;
+
+    const handleVideoLoadedData = () => {
+        // Video metadata has been loaded
+        setIsVideoReady(true);
+    };
+
+    const handleVideoError = () => {
+        // Video data is not available
+        setIsVideoAvailable(false);
+    };
+
+    useEffect(() => {
+        // Reset video availability on modal open
+        setIsVideoAvailable(true);
+    }, [isOpen]);
+
     return (
         <Modal
             isOpen={isOpen}
@@ -17,18 +36,33 @@ const VideoModal = ({ isOpen, videoUrl, onRequestClose }) => {
                     right: 'auto',
                     bottom: 'auto',
                     transform: 'translate(-50%, -50%)',
-                    //margin: 0, // Remove the margin
-                    padding:0
+                    padding: 0
                 },
             }}
-            contentLabel="Video Modal">
+            contentLabel="Video Modal"
+        >
             <div className="modal-header">
-                <h6 className="align-items-center">Video</h6><button className="close-button" onClick={onRequestClose}>X</button></div>
+                <h6 className="align-items-center">Video</h6>
+                <button className="close-button" onClick={onRequestClose}>
+                    X
+                </button>
+            </div>
             <div className="modal-content">
-                <video controls width="100%" height="100%">
-                    <source src={f_path} type="video/mp4"></source>
+                {isVideoAvailable ? (
+                    <video
+                        ref={videoRef}
+                        controls
+                        width="100%"
+                        height="100%"
+                        onLoadedData={handleVideoLoadedData}
+                        onError={handleVideoError}
+                    >
+                        <source src={f_path} type="video/mp4" />
                         Your browser does not support the video tag.
-                </video>
+                    </video>
+                ) : (
+                        <p className="error-text">Video data is not available. Please check after some time.</p>
+                )}
             </div>
         </Modal>
     );

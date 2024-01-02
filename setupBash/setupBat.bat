@@ -9,49 +9,38 @@ set SAIFrameworkEnv=SAIFrameworkEnv
 set super_ai_requirement=super_ai_requirement.txt
 set sai_framwork_requirement=sai_requirement.txt
 
-rem Check if Python is already installed
-where python > nul 2>nul
-if %errorlevel% equ 0 (
-    echo Python is already installed.
-) else (
-    rem Install Python
-    echo Installing Python...
-    %PYTHON_INSTALLER%
-    if %errorlevel% neq 0 (
-        echo Error installing Python. Press any key to exit.
-        pause
-        exit /b %errorlevel%
-    )
-    echo Python installation completed.
+rem Install Python
+echo Installing Python...
+%PYTHON_INSTALLER%
+if %errorlevel% neq 0 (
+    echo Error installing Python. Press any key to exit.
+    pause
+    exit /b %errorlevel%
 )
+echo Python installation completed.
 
-rem Check if Node.js is already installed
-where node > nul 2>nul
-if %errorlevel% equ 0 (
-    echo Node.js is already installed.
-) else (
-    rem Check if Node.js MSI installer exists
-    if exist %NODEJS_MSI_INSTALLER% (
-        rem Install Node.js using MSI installer
-        echo Installing Node.js...
-        msiexec /i %NODEJS_MSI_INSTALLER%
-        if %errorlevel% neq 0 (
-            echo Error installing Node.js. Press any key to exit.
-            pause
-            exit /b %errorlevel%
-        )
-        echo Node.js installation completed.
-    ) else (
-        rem Install Node.js using executable installer
-        echo Installing Node.js...
-        %NODEJS_INSTALLER%
-        if %errorlevel% neq 0 (
-            echo Error installing Node.js. Press any key to exit.
-            pause
-            exit /b %errorlevel%
-        )
-        echo Node.js installation completed.
+
+rem Check if Node.js MSI installer exists
+if exist %NODEJS_MSI_INSTALLER% (
+    rem Install Node.js using MSI installer
+    echo Installing Node.js...
+    msiexec /i %NODEJS_MSI_INSTALLER%
+    if %errorlevel% neq 0 (
+        echo Error installing Node.js. Press any key to exit.
+        pause
+        @REM exit /b %errorlevel%
     )
+    echo Node.js installation completed.
+) else (
+    rem Install Node.js using executable installer
+    echo Installing Node.js...
+    %NODEJS_INSTALLER%
+    if %errorlevel% neq 0 (
+        echo Error installing Node.js. Press any key to exit.
+        pause
+        @REM exit /b %errorlevel%
+    )
+    echo Node.js installation completed.
 )
 
 rem Create a new virtual environment
