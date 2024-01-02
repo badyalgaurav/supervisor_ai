@@ -73,7 +73,6 @@ thread_termination_flags = {1: False, 2: False, 3: False, 4: False}
 # FOR CLASS SOLUTION
 async def generate_frames(camera_id, background_tasks: BackgroundTasks):
     camera_processor = CameraProcessor(camera_id)
-    # camera_processor.start_video_writer()
     try:
         while not thread_termination_flags[camera_id]:
             frame = camera_streams[camera_id].read()
@@ -95,8 +94,6 @@ async def generate_frames(camera_id, background_tasks: BackgroundTasks):
                 frame_bytes = buffer.tobytes()
                 yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
                 camera_processor.write_frame_to_disk_async(frame)
-
-
     except Exception as e:
         print(f"Exception: {e}")
         pass

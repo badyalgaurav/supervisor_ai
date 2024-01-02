@@ -95,26 +95,6 @@ class CameraProcessor:
         insert_events_db(self.camera_id, video_path, start_time, end_time)
         return "success"
 
-    # def write_frame_to_disk_async(self, frame):
-    #     current_time = time.time()
-    #     video_filename = self.create_file_name()
-    #     if self.start_time is None or current_time - self.start_time >= self.duration_per_file:
-    #         if self.video_writer is not None:
-    #             self.video_writer.release()
-    #             if self.is_person_in_warning:
-    #                 start_save_time = datetime.datetime.now() - datetime.timedelta(seconds=self.duration_per_file)
-    #                 end_save_time = datetime.datetime.now()
-    #                 self.insert_event(video_filename, start_save_time, end_save_time)
-    #                 self.is_person_in_warning = False
-    #
-    #         frame_height, frame_width, _ = frame.shape
-    #         fourcc =cv2.VideoWriter_fourcc(*'h264')  # cv2.VideoWriter_fourcc(*'DIVX')
-    #         fps = 15
-    #         frame_size = (frame_width, frame_height)
-    #         self.video_writer = cv2.VideoWriter(video_filename, fourcc, fps, frame_size)
-    #         self.start_time = current_time
-    #     self.video_writer.write(frame)
-
     def write_frame_to_disk_async(self, frame):
         current_time = time.time()
         video_filename = self.create_file_name()
