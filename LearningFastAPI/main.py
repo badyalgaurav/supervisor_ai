@@ -6,12 +6,8 @@ import uvicorn
 import asyncio
 import imutils
 from imutils.video import VideoStream
-# from logic import human_detection
-# from fastapi import BackgroundTasks
-
 from logic.human_detection_class import CameraProcessor
 from logic.mongo_op import get_all_polygon, get_camera_settings
-import time
 
 # import signal
 app = FastAPI()
@@ -44,26 +40,12 @@ async def fetch_data_periodically():
 async def startup_event():
     # signal.signal(signal.SIGINT, stop_stream)
     # Start the background task to fetch data periodically
-
     asyncio.create_task(fetch_data_periodically())
-    # global camera_streams
-    # camera_streams = get_camera_settings()
 
-
-#
-# url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-# url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-# url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-# url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
 
 # Create VideoStream instances for each camera
 camera_streams = {}
-# {
-#     1: VideoStream(url_rtsp_1).start(),
-#     2: VideoStream(url_rtsp_2).start(),
-#     3: VideoStream(url_rtsp_3).start(),
-#     4: VideoStream(url_rtsp_4).start(),
-# }
+
 
 frame_counters = {1: 0, 2: 0, 3: 0, 4: 0}
 
