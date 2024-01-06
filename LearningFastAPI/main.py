@@ -51,18 +51,19 @@ async def startup_event():
 
 
 #
-url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+# url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+# url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+# url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+# url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
 
 # Create VideoStream instances for each camera
-camera_streams = {
-    1: VideoStream(url_rtsp_1).start(),
-    2: VideoStream(url_rtsp_2).start(),
-    3: VideoStream(url_rtsp_3).start(),
-    4: VideoStream(url_rtsp_4).start(),
-}
+camera_streams = {}
+# {
+#     1: VideoStream(url_rtsp_1).start(),
+#     2: VideoStream(url_rtsp_2).start(),
+#     3: VideoStream(url_rtsp_3).start(),
+#     4: VideoStream(url_rtsp_4).start(),
+# }
 
 frame_counters = {1: 0, 2: 0, 3: 0, 4: 0}
 
@@ -100,6 +101,22 @@ async def generate_frames(camera_id, background_tasks: BackgroundTasks):
     finally:
         # Asynchronously release the video writer
         await asyncio.to_thread(camera_processor.release_video_writer)
+
+
+@app.get("/camera_startup")
+def camera_startup():
+    url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+    url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+    url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+    url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+    global camera_streams
+    camera_streams = {
+        1: VideoStream(url_rtsp_1).start(),
+        2: VideoStream(url_rtsp_2).start(),
+        3: VideoStream(url_rtsp_3).start(),
+        4: VideoStream(url_rtsp_4).start(),
+    }
+    return "success"
 
 
 @app.get("/video_feed")
