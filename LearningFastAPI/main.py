@@ -6,12 +6,9 @@ import uvicorn
 import asyncio
 import imutils
 from imutils.video import VideoStream
-# from logic import human_detection
-# from fastapi import BackgroundTasks
 
 from logic.human_detection_class import CameraProcessor
 from logic.mongo_op import get_all_polygon, get_camera_settings
-import time
 
 # import signal
 app = FastAPI()
@@ -26,8 +23,6 @@ app.add_middleware(
 # Define a global variable to store the data
 database_data = None
 
-
-# camera_streams=None
 
 async def fetch_data_periodically():
     while True:
@@ -50,20 +45,34 @@ async def startup_event():
     # camera_streams = get_camera_settings()
 
 
-#
-# url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-# url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-# url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-# url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-
 # Create VideoStream instances for each camera
 camera_streams = {}
-# {
-#     1: VideoStream(url_rtsp_1).start(),
-#     2: VideoStream(url_rtsp_2).start(),
-#     3: VideoStream(url_rtsp_3).start(),
-#     4: VideoStream(url_rtsp_4).start(),
-# }
+
+
+@app.get("/camera_startup")
+def camera_startup():
+    url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+    url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+    url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+    url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+    global camera_streams
+    camera_streams = {
+        1: VideoStream(url_rtsp_1).start(),
+        2: VideoStream(url_rtsp_2).start(),
+        3: VideoStream(url_rtsp_3).start(),
+        4: VideoStream(url_rtsp_4).start(),
+    }
+    # Check if any camera stream is still loading
+    if is_loading(camera_streams[1], camera_streams[2], camera_streams[3], camera_streams[4]):
+        return "loading"
+    else:
+        return "success"
+
+
+# Define a function to check loading status
+def is_loading(*streams):
+    return any(stream.more() for stream in streams)
+
 
 frame_counters = {1: 0, 2: 0, 3: 0, 4: 0}
 
@@ -103,22 +112,6 @@ async def generate_frames(camera_id, background_tasks: BackgroundTasks):
         await asyncio.to_thread(camera_processor.release_video_writer)
 
 
-@app.get("/camera_startup")
-def camera_startup():
-    url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-    url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-    url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-    url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-    global camera_streams
-    camera_streams = {
-        1: VideoStream(url_rtsp_1).start(),
-        2: VideoStream(url_rtsp_2).start(),
-        3: VideoStream(url_rtsp_3).start(),
-        4: VideoStream(url_rtsp_4).start(),
-    }
-    return "success"
-
-
 @app.get("/video_feed")
 async def video_feed(camera_id: int, background_tasks: BackgroundTasks):
     if camera_id in camera_streams:
@@ -128,20 +121,10 @@ async def video_feed(camera_id: int, background_tasks: BackgroundTasks):
         return "Camera not found"
 
 
-# def stop_stream(*args):
-# for camera_id in camera_streams:
-#     thread_termination_flags[camera_id] = True
-#     # stop_stream(camera_id)
-#     camera_streams[camera_id].stop()
-#     print(f"stopped camera process {camera_id}")
-
+@app.get("/stop_stream")
 def stop_stream(camera_id):
     camera_streams[camera_id].stop()
     print(f"stopped camera process {camera_id}")
-
-
-def start_stream(camera_id):
-    camera_streams[camera_id].start()
 
 
 @app.on_event("shutdown")
