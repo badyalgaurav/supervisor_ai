@@ -104,6 +104,9 @@ async def generate_frames(camera_id, background_tasks: BackgroundTasks):
                 frame_bytes = buffer.tobytes()
                 yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
                 camera_processor.write_frame_to_disk_async(frame)
+            else:
+                camera_streams[camera_id].stop()
+                camera_streams[camera_id]=VideoStream(url_rtsp_1).start()
     except Exception as e:
         print(f"Exception: {e}")
         pass
