@@ -46,22 +46,22 @@ async def startup_event():
 
 
 # Create VideoStream instances for each camera
-camera_streams = {}
+url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+
+camera_streams = {
+    1: VideoStream(url_rtsp_1).start(),
+    2: VideoStream(url_rtsp_2).start(),
+    3: VideoStream(url_rtsp_3).start(),
+    4: VideoStream(url_rtsp_4).start(),
+}
 
 
 @app.get("/camera_startup")
 def camera_startup():
-    url_rtsp_1 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-    url_rtsp_2 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-    url_rtsp_3 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
-    url_rtsp_4 = f'rtsp://admin:Trace3@123@192.168.1.64:554'
     global camera_streams
-    camera_streams = {
-        1: VideoStream(url_rtsp_1).start(),
-        2: VideoStream(url_rtsp_2).start(),
-        3: VideoStream(url_rtsp_3).start(),
-        4: VideoStream(url_rtsp_4).start(),
-    }
     # Check if any camera stream is still loading
     if is_loading(camera_streams[1], camera_streams[2], camera_streams[3], camera_streams[4]):
         return "loading"
@@ -71,7 +71,7 @@ def camera_startup():
 
 # Define a function to check loading status
 def is_loading(*streams):
-    return any(stream.more() for stream in streams)
+    return any(stream.read() is None for stream in streams)
 
 
 frame_counters = {1: 0, 2: 0, 3: 0, 4: 0}

@@ -51,7 +51,7 @@ const Navbar = (props) => {
             <div className={`sidebar pb-3 ${props.isOpen ? 'open' : ''}`}>
                 <nav class="navbar bg-secondary navbar-dark">
                     <a href="index.html" class="navbar-brand mx-4 mb-3">
-                        <h3 class="text-primary"><i class="fa fa-cogs me-2"></i>DarkPan</h3>
+                        <h3 class="text-primary"><i class="fa fa-cogs me-2"></i>Geo Cam</h3>
                     </a>
                     <div class="navbar-nav w-100">
                         <div class="nav-item dropdown">
