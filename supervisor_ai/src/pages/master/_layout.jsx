@@ -19,16 +19,38 @@ const Layout = () => {
     const [showSpinner, setShowSpinner] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
 
+    const initCamera = () => {
+        setShowSpinner(true);
+        const apiUrl = `${apiWebSocketPath}/camera_startup/`;
+        axios.get(apiUrl)
+            .then((response) => {
+                debugger;
+                if (response.data == "loading") {
+                    setTimeout(() => {
+                        initCamera();
+                    }, 1000);
+                }
+                else {
+                    setShowSpinner(false);
+                }
+                
+            })
+            .catch((error) => {
+                console.error('Error fetching data:', error);
+            });
+    };
 
-
+  
+   
+  
     useEffect(() => {
         // Show the spinner initially
         setShowSpinner(true);
+        initCamera();
         // Set a timeout to hide the spinner after the delay
         const timeoutId = setTimeout(() => {
             setShowSpinner(false);
         }, 1);
-
         // Clean up the timeout when the component unmounts or when the effect is re-run
         return () => clearTimeout(timeoutId);
     }, []); // The empty array [] ensures the effect runs only once after the initial render
