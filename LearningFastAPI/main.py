@@ -7,9 +7,10 @@ import asyncio
 import imutils
 from imutils.video import VideoStream
 
-from logic.human_detection_class import CameraProcessor
-from logic.mongo_op import get_all_polygon, get_camera_settings
-
+# from logic.human_detection_class import CameraProcessor
+# from logic.mongo_op import get_all_polygon, get_camera_settings
+from geofence.human_detection_class import CameraProcessor
+from geofence.mongo_op import get_all_polygon,get_camera_settings
 # import signal
 app = FastAPI()
 app.add_middleware(
@@ -128,6 +129,7 @@ async def video_feed(camera_id: int, background_tasks: BackgroundTasks):
 def stop_stream(camera_id):
     camera_streams[camera_id].stop()
     print(f"stopped camera process {camera_id}")
+
 
 
 @app.on_event("shutdown")
