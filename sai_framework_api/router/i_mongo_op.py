@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from fastapi.responses import  FileResponse
+from fastapi.responses import FileResponse
 from logic import mongo_op
 import json
 from logic.schemas.polygon_info_schemas import PolygonInfoSchemas
@@ -29,7 +29,7 @@ async def get_alert_details(camera_id: int, start_date: str, end_date: str):
 async def upsert_polygon(model: PolygonInfoSchemas):
     camera_no = model.camera_no
     polygon_info = json.loads(model.polygon_info)
-    res = mongo_op.upsert_polygon(camera_no=camera_no, polygon_info=polygon_info,start_time=model.start_time,end_time=model.end_time)
+    res = mongo_op.upsert_polygon(camera_no=camera_no, polygon_info=polygon_info, start_time=model.start_time, end_time=model.end_time)
 
     return res
 
@@ -41,7 +41,18 @@ async def get_video(video_path):
     # return FileResponse(video_path, media_type="video/mp4")
     return FileResponse(video_path, media_type="video/mp4")
 
+
 @router.get("/get_time_data")
 async def get_time_data():
     res = mongo_op.get_time_data()
     return res
+
+
+from logic.schemas.polygon_info_schemas import CameraInfo
+
+@router.post("/setup_registration")
+async def setup_registration(data: CameraInfo):
+    # send the data to mongodb
+    mongo_op.setup_registration(data)
+
+    return {"message": "Form submitted successfully"}

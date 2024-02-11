@@ -3,6 +3,7 @@ geo_fence.egg-info/PKG-INFO
 geo_fence.egg-info/SOURCES.txt
 geo_fence.egg-info/dependency_links.txt
 geo_fence.egg-info/top_level.txt
+geofence/FrameGenerator.py
 geofence/__init__.py
 geofence/alarm.py
 geofence/human_detection_class.py

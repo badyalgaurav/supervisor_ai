@@ -8,7 +8,7 @@ import imutils
 from imutils.video import VideoStream
 from logic import human_detection
 from logic.human_detection_class import CameraProcessor
-from logic.mongo_op import get_all_polygon, get_camera_settings
+from logic.mongo_op import get_all_polygon
 
 # import signal
 app = FastAPI()
