@@ -291,9 +291,9 @@
 /*CUSTOM STYLES BY GARRY*/
 /* Set the remaining height using calc() */
 .row {
-    height: calc(100vh); /* Subtract header height from viewport height */
+    min-height: calc(100vh); /* Subtract header height from viewport height */
     align-items: center;
-    justify-content: center;
+    /*justify-content: center;*/
 }
 
 .camera_card {

@@ -17,6 +17,8 @@ const FabricJSCanvas = (props) => {
     const contextData = useContext(MainContextProvider);
 
     const cameraId = props.cameraId;
+    const height = props.height;
+    const width = props.width;
     const canvasId = 'canvas_' + cameraId;
 
     const [polyEditable, setPolyEditable] = useState(false);
@@ -56,8 +58,8 @@ const FabricJSCanvas = (props) => {
     }
     const initFabric = () => {
         fabricRef.current = new fabric.Canvas(canvasId, {
-            height: 534,
-            width: 812,
+            height: height,
+            width: width,
             selection: false
         });
         loadObjects();
@@ -169,8 +171,8 @@ const FabricJSCanvas = (props) => {
 
                 line = new fabric.Line(points, {
                     strokeWidth: 2,
-                    fill: name == "recPoly" ? "white" : "red",
-                    stroke: name == "recPoly" ? "white" : "red",
+                    fill: name == "recPoly" ? "#FFFB00" : "#FF001B",
+                    stroke: name == "recPoly" ? "#FFFB00" : "#FF001B",
                     originX: "center",
                     originY: "center",
                     strokeUniform: true,
@@ -243,7 +245,7 @@ const FabricJSCanvas = (props) => {
             polygon = new fabric.Polygon(vt, {
                 fill: "transparent",
                 strokeWidth: 2,
-                stroke: name == "recPoly" ? "white" : "red",
+                stroke: name == "recPoly" ? "#FFFB00" : "#FF001B",
                 objectCaching: false,
                 transparentCorners: false,
                 cornerColor: "blue",
@@ -294,7 +296,6 @@ const FabricJSCanvas = (props) => {
     // and the current position in canvas coordinate
     // transform.target is a reference to the current object being transformed,
     function actionHandler(eventData, transform, x, y) {
-        console.log("test");
         let polygon = transform.target,
             currentControl = polygon.controls[polygon.__corner],
             mouseLocalPosition = polygon.toLocalPoint(
@@ -348,7 +349,7 @@ const FabricJSCanvas = (props) => {
         polygon.hasBorders = false;
         let lastControl = polygon.points.length - 1;
         polygon.cornerStyle = "circle";
-        polygon.cornerColor = "yellow";// "rgba(0,0,255,0.5)";
+        polygon.cornerColor = "#17E3CF";// "rgba(0,0,255,0.5)";
         polygon.controls = polygon.points.reduce(function (acc, point, index) {
             acc["p" + index] = new fabric.Control({
                 positionHandler: polygonPositionHandler,
@@ -365,6 +366,7 @@ const FabricJSCanvas = (props) => {
         fabricRef.current.requestRenderAll();
         restrictCrossBoundary();
     }
+
     const handleSavePolygonInfo = () => {
         debugger;
         var startTime = document.getElementById(`startTime_${cameraId}`).value;
