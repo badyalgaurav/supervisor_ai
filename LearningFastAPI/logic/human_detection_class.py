@@ -10,6 +10,9 @@ from shapely.geometry import box as box_shape
 from logic.alarm import start_camera_alert, stop_camera_alert
 from logic.mongo_op import insert_events_db
 
+# from geofence.alarm import start_camera_alert, stop_camera_alert
+# from geofence.mongo_op import insert_events_db
+
 yolo_model = YOLO("yolov8n.pt")
 confidence_threshold = 0.60
 

@@ -6,10 +6,10 @@ pygame.mixer.init()
 
 # Create Sound objects for different sound files
 sound_files = {
-    1: pygame.mixer.Sound('logic/danger_alert.wav'),
-    2: pygame.mixer.Sound('logic/cam2.mp3'),
-    3: pygame.mixer.Sound('logic/danger_alert.wav'),
-    4: pygame.mixer.Sound('logic/danger_alert.wav')
+    1: pygame.mixer.Sound('content/danger_alert.wav'),
+    2: pygame.mixer.Sound('content/cam2.mp3'),
+    3: pygame.mixer.Sound('content/danger_alert.wav'),
+    4: pygame.mixer.Sound('content/danger_alert.wav')
 }
 
 # Create a dictionary to keep track of playing threads and events for each camera

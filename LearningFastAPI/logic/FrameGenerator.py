@@ -7,6 +7,9 @@ import time
 from logic.human_detection_class import CameraProcessor
 from logic.mongo_op import get_all_polygon
 
+# from geofence.human_detection_class import CameraProcessor
+# from geofence.mongo_op import get_all_polygon
+
 
 class FrameGenerator:
     def __init__(self, camera_id, url_rtsp, height, width):
