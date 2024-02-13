@@ -1,7 +1,7 @@
-from imutils.video import VideoStream
+# from imutils.video import VideoStream
 from pymongo import MongoClient
 import pandas as pd
-import numpy as np
+# import numpy as np
 from shapely.geometry import Polygon
 
 

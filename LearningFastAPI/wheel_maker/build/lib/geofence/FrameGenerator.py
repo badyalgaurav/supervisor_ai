@@ -4,7 +4,8 @@ import imutils
 import asyncio
 import cv2
 import time
-from logic.mongo_op import get_all_polygon
+# from logic.mongo_op import get_all_polygon
+from geofence.mongo_op import get_all_polygon
 
 # Define a global variable to store the data
 database_data = None
