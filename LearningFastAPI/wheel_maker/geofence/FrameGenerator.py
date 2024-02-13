@@ -1,4 +1,4 @@
-from logic.human_detection_class import CameraProcessor
+from geofence.human_detection_class import CameraProcessor
 from imutils.video import VideoStream
 import imutils
 import asyncio
