@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import DashboardCamCard from '../../components/DashboardCamCard';
-import { apiGemmiz } from "../../config"
-import axios from 'axios';
+
 
 const Dashboard = () => {
     const [data, setData] = useState(null);
@@ -40,7 +39,6 @@ const Dashboard = () => {
 
     const loadInit = () => {
         if (localStorage.getItem("cameraInfo")) {
-            debugger;
             // Set the data and update the loading state
             const result = JSON.parse(localStorage.getItem("cameraInfo"))
             const response = updateDimensions(result);

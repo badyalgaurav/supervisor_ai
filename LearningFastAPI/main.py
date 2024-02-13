@@ -5,8 +5,8 @@ from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-# from logic.FrameGenerator import FrameGenerator
-from geofence.FrameGenerator import FrameGenerator
+from logic.FrameGenerator import FrameGenerator
+# from geofence.FrameGenerator import FrameGenerator
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import NavbarCamCard from "../../components/NavbarCamCard"
 import { apiSAIFrameworkAPIPath } from "../../config"
-
+import Swal from "sweetalert2";
 
 
 const Navbar = (props) => {
     const [data, setData] = useState("");
     const [cloudData, setCloudData] = useState([]);
     const [timeData, setTimeData] = useState("");
-
+    const navigate = useNavigate();
     useEffect(() => {
         // Function to make an Axios request
         const fetchData = () => {
@@ -61,14 +62,36 @@ const Navbar = (props) => {
         loadInit();
     }, []);
 
+    const handleLogout = () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You want to logout!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Handle the deletion logic here
+                Swal.fire('Logout!', 'you are successfully logout.', 'success');
+                localStorage.removeItem("email");
+                localStorage.removeItem("password");
+                localStorage.removeItem("cameraInfo");
+                navigate('/Login');
+            }
+        });
+    }
 
     return (
         <>
             <div className={`sidebar pb-3 ${props.isOpen ? 'open' : ''}`}>
                 <nav class="navbar bg-secondary navbar-dark">
-                    <a href="index.html" class="navbar-brand mx-4 mb-3">
-                        <h3 class="text-primary">SafetyEyePro</h3>
-                    </a>
+                    <div href="" class="navbar-brand mx-4 mb-3">
+                        <h3 class="text-primary">SafetyEyePro <span class="text-primary text-right"><i class="fa fa-power-off" aria-hidden="true" onClick={handleLogout }></i></span></h3>
+                        
+
+                    </div>
                     <div class="navbar-nav w-100">
                         <div class="nav-item dropdown">
 

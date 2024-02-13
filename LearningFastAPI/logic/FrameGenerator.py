@@ -3,7 +3,7 @@ import imutils
 import asyncio
 import cv2
 import time
-
+import concurrent.futures
 from logic.human_detection_class import CameraProcessor
 from logic.mongo_op import get_all_polygon
 
@@ -45,14 +45,23 @@ class FrameGenerator:
                 frame = self.camera_streams.read()
                 if frame is not None:
                     frame = imutils.resize(frame, width=self.width, height=self.height)
-                    copy_frame = frame.copy()
+                    # copy_frame = frame.copy()
+                    # write video file
+                    await asyncio.to_thread(self.camera_processor.write_frame_to_disk_async, frame)
                     self.frame_counters += 1
                     if self.database_data:
                         poly_info = self.database_data.get(self.camera_id).get("polygon_list")
                         rec_poly_info = self.database_data.get(self.camera_id).get("recPoly_dict")
 
-                        if self.frame_counters % 5 == 0:
-                            await asyncio.to_thread(self.camera_processor.detect_person_in_polygon, frame, poly_info, rec_poly_info)
+                        if self.frame_counters % 2 == 0:
+                            # await asyncio.to_thread(self.camera_processor.detect_person_in_polygon, frame, poly_info, rec_poly_info)
+                            # Use a thread pool for CPU-bound tasks
+                            loop = asyncio.get_running_loop()
+                            await loop.run_in_executor(
+                                concurrent.futures.ThreadPoolExecutor(),
+                                self.camera_processor.detect_person_in_polygon,
+                                frame, poly_info, rec_poly_info
+                            )
                             self.frame_counters = 0
                         else:
                             await asyncio.to_thread(self.camera_processor.from_box_person_in_polygon, frame, poly_info, rec_poly_info)
@@ -60,7 +69,7 @@ class FrameGenerator:
                     _, buffer = cv2.imencode(".jpg", frame)
                     frame_bytes = buffer.tobytes()
                     yield (b'--frame\r\n' b'Content-Type: image/jpg\r\n\r\n' + frame_bytes + b'\r\n')
-                    await asyncio.to_thread(self.camera_processor.write_frame_to_disk_async, copy_frame)
+
 
                 else:
                     # Set the flag to restart the stream
@@ -83,6 +92,6 @@ class FrameGenerator:
             import traceback
             traceback.print_exc()
             pass
-        finally:
-            # await asyncio.to_thread(camera_processor.release_video_writer)
-            self.camera_streams.stream.release()
+        # finally:
+        #     await asyncio.to_thread(self.camera_processor.release_video_writer)
+        #     self.camera_streams.stream.release()

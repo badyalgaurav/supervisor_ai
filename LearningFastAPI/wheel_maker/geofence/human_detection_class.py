@@ -26,15 +26,16 @@ names = yolo_model.model.names
 
 class CameraProcessor:
     def __init__(self, camera_id):
-        self.video_writer = None
+
         self.start_time = None
-        self.duration_per_file = 60  # 1 minutes in seconds
+        self.duration_per_file = 60*1  #1 minutes in seconds
 
         self.camera_id = camera_id
         self.model = yolo_model
 
         # Polygon and camera state initialization
         self.is_person_in_danger = False
+        # self.is_alert = False
         self.is_person_in_warning = False
         self.is_person_remain_in_warning = False
         self.is_person_remain_in_danger = False
@@ -45,33 +46,17 @@ class CameraProcessor:
         self.frame_h_boxes = []
         self.is_person_remain_in_danger_start_time = ""
         self.video_filename = self.generate_file_name()
-
-    # def detect_person_in_polygon(self, img, poly_info, rec_poly_info):
-    #     # try:
-    #     results = self.model(img, stream=True, classes=class_names, conf=confidence_threshold, imgsz=320)
-    #     # first_result = next(results)
-    #     # if first_result.boxes.id is not None:
-    #     self.is_person_in_danger = False
-    #     # self.is_person_in_warning = False
-    #     self.frame_h_boxes = []
-    #     for r in results:
-    #         boxes = r.boxes
-    #         self.frame_h_boxes.append(boxes)
-    #     self.draw_rect(img, poly_info, rec_poly_info)
-    #
-    #     # except Exception as e:
-    #     #     # Handle the case when the generator is empty
-    #     #     pass
-    #     return img
+        self.video_writer = None
 
     def detect_person_in_polygon(self, img, poly_info, rec_poly_info):
-        results = self.model.track(img, stream=True, classes=0, conf=confidence_threshold, imgsz=320)
+        results = self.model(img, stream=True, classes=0, conf=confidence_threshold, imgsz=320)
+
         self.is_person_in_danger = False
-        # self.is_person_in_warning = False
         self.frame_h_boxes = []
         try:
             for r in results:
-                if r.boxes.id is not None:
+                # if r.boxes.id is not None:
+                if len(r.boxes.xyxy.cpu()):
                     boxes = r.boxes.xyxy.cpu()
                     self.frame_h_boxes.append(boxes)
         except:
@@ -80,6 +65,7 @@ class CameraProcessor:
             self.draw_rect(img, poly_info, rec_poly_info)
         else:
             stop_camera_alert(self.camera_id)
+
         return img
 
     def from_box_person_in_polygon(self, img, poly_info, rec_poly_info):
@@ -135,27 +121,48 @@ class CameraProcessor:
         insert_events_db(self.camera_id, video_path, start_time, end_time)
         return "success"
 
+    # def write_frame_to_disk_async(self, frame):
+    #     current_time = time.time()
+    #
+    #     # this if condition code is only for generating new file for video recording and saving current file + save the data to db if anytime within the range intrusion occured.
+    #     if self.start_time is None or (current_time - self.start_time) >= self.duration_per_file:
+    #
+    #         self.start_time = current_time
+    #         if self.is_person_in_warning:
+    #             start_save_time = datetime.datetime.now() - datetime.timedelta(seconds=self.duration_per_file)
+    #             end_save_time = datetime.datetime.now()
+    #             self.insert_event(self.video_filename, start_save_time, end_save_time)
+    #             self.is_person_in_warning = False
+    #
+    #     if self.video_writer is not None and self.video_writer.isOpened():
+    #         self.video_writer.write(frame)
+    #     else:
+    #         # Release the previous video writer asynchronously
+    #         self.release_video_writer()
+    #         # generate new filename and video writer
+    #         self.video_filename = self.generate_file_name()
+    #         self.video_writer = self.generate_video_writer(frame)
+
     def write_frame_to_disk_async(self, frame):
         current_time = time.time()
-
         # this if condition code is only for generating new file for video recording and saving current file + save the data to db if anytime within the range intrusion occured.
-        if self.start_time is None or (current_time - self.start_time) >= self.duration_per_file:
-
-            self.start_time = current_time
+        if self.start_time is None or current_time - self.start_time >= self.duration_per_file:
+            # if self.video_writer.isOpened():  # Check if VideoWriter is open
             if self.is_person_in_warning:
                 start_save_time = datetime.datetime.now() - datetime.timedelta(seconds=self.duration_per_file)
                 end_save_time = datetime.datetime.now()
                 self.insert_event(self.video_filename, start_save_time, end_save_time)
                 self.is_person_in_warning = False
 
+            if self.video_writer is not None:
+                self.video_writer.release()
+                self.video_filename = self.generate_file_name()
+
+            self.video_writer = self.generate_video_writer(frame=frame)
+            self.start_time = current_time
+
         if self.video_writer is not None and self.video_writer.isOpened():
             self.video_writer.write(frame)
-        else:
-            # Release the previous video writer asynchronously
-            self.release_video_writer()
-            # generate new filename and video writer
-            self.video_filename = self.generate_file_name()
-            self.video_writer = self.generate_video_writer(frame)
 
     def generate_file_name(self):
         current_datetime = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
@@ -167,17 +174,23 @@ class CameraProcessor:
 
     def generate_video_writer(self, frame):
         frame_height, frame_width, _ = frame.shape
-        # fourcc = cv2.VideoWriter_fourcc(*'h264')
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # cv2.VideoWriter_fourcc(*'h264')
+        fourcc = cv2.VideoWriter_fourcc(*'h264')
+        # fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # cv2.VideoWriter_fourcc(*'h264')
+        # fourcc = cv2.VideoWriter_fourcc(*"MJPG")  # cv2.VideoWriter_fourcc(*'h264')
+        # fourcc = cv2.VideoWriter_fourcc(*"avc1")  # cv2.VideoWriter_fourcc(*'h264')
         fps = 15
         frame_size = (frame_width, frame_height)
         video_writer = cv2.VideoWriter(self.video_filename, fourcc, fps, frame_size)
         return video_writer
 
-    def release_video_writer(self):
-        asyncio.create_task(self.release_video_writer_async())
-
-    async def release_video_writer_async(self):
-        if self.video_writer is not None:
-            self.video_writer.release()
-            self.video_writer = None
+    # def release_video_writer(self):
+    #     asyncio.create_task(self.release_video_writer_async())
+    #
+    # async def release_video_writer_async(self):
+    #     if self.video_writer is not None:
+    #         self.video_writer.release()
+    #         self.video_writer = None
+    # def release_video_writer(self):
+    #     if self.video_writer is not None:
+    #         self.video_writer.release()
+    #         self.video_writer = None
