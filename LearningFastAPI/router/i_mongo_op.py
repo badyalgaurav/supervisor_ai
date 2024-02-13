@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from logic import mongo_op
-from logic.schemas.polygon_info_schemas import PolygonInfoSchemas
+from geofence import mongo_op
+from geofence.schemas.polygon_info_schemas import PolygonInfoSchemas
 
 router = APIRouter(prefix="/mongo_op", tags=["mongo_op"])
 
