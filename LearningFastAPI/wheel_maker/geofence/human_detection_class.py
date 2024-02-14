@@ -24,11 +24,19 @@ yolo_model.to("cuda") if device == "0" else yolo_model.to("cpu")
 names = yolo_model.model.names
 
 
+def is_current_time_in_range(start_time, end_time):
+    current_datetime = datetime.now()
+    start_datetime = current_datetime.replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0)
+    end_datetime = current_datetime.replace(hour=end_time.hour, minute=end_time.minute, second=0, microsecond=0)
+
+    return start_datetime <= current_datetime <= end_datetime
+
+
 class CameraProcessor:
     def __init__(self, camera_id):
 
         self.start_time = None
-        self.duration_per_file = 60*1  #1 minutes in seconds
+        self.duration_per_file = 60 * 1  # 1 minutes in seconds
 
         self.camera_id = camera_id
         self.model = yolo_model
@@ -48,7 +56,7 @@ class CameraProcessor:
         self.video_filename = self.generate_file_name()
         self.video_writer = None
 
-    def detect_person_in_polygon(self, img, poly_info, rec_poly_info):
+    def detect_person_in_polygon(self, img, poly_info, rec_poly_info, config_options: dict):
         results = self.model(img, stream=True, classes=0, conf=confidence_threshold, imgsz=320)
 
         self.is_person_in_danger = False
@@ -61,23 +69,24 @@ class CameraProcessor:
                     self.frame_h_boxes.append(boxes)
         except:
             pass
+
         if self.frame_h_boxes:
-            self.draw_rect(img, poly_info, rec_poly_info)
+            self.draw_rect(img, poly_info, rec_poly_info, config_options)
         else:
             stop_camera_alert(self.camera_id)
 
         return img
 
-    def from_box_person_in_polygon(self, img, poly_info, rec_poly_info):
+    def from_box_person_in_polygon(self, img, poly_info, rec_poly_info, config_options: dict):
         try:
             if self.frame_h_boxes:
                 # for boxes in self.frame_h_boxes:
-                self.draw_rect(img, poly_info, rec_poly_info)
+                self.draw_rect(img, poly_info, rec_poly_info, config_options)
         except Exception as e:
             print(f'{e}')
         return img
 
-    def draw_rect(self, img, poly_info, rec_poly_info):
+    def draw_rect(self, img, poly_info, rec_poly_info, config_options: dict):
         for boxes in self.frame_h_boxes:
             for box in boxes:
                 x1, y1, x2, y2 = box
@@ -98,14 +107,15 @@ class CameraProcessor:
                         self.is_person_in_danger = True
                         self.is_person_in_warning = True
                         cv2.rectangle(img, (x1, y1), (x2, y2), (0, 0, 255), 3)
-        self.process_frame()
+        self.process_frame(config_options)
         return img
 
-    def process_frame(self):
-        if self.is_person_in_danger:
-            self.handle_person_in_danger()
-        else:
-            self.handle_person_not_in_danger()
+    def process_frame(self, config_options: dict):
+        if is_current_time_in_range(config_options.get("start_time"), config_options.get("end_time")):
+            if self.is_person_in_danger:
+                self.handle_person_in_danger()
+            else:
+                self.handle_person_not_in_danger()
 
     def handle_person_in_danger(self):
         if self.person_state == 0:

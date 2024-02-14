@@ -51,25 +51,25 @@ class FrameGenerator:
                     if self.database_data:
                         poly_info = self.database_data.get(self.camera_id).get("polygon_list")
                         rec_poly_info = self.database_data.get(self.camera_id).get("recPoly_dict")
-
-                        if self.frame_counters % 2 == 0:
-                            # await asyncio.to_thread(self.camera_processor.detect_person_in_polygon, frame, poly_info, rec_poly_info)
+                        start_time = self.database_data.get(self.camera_id).get("start_time")
+                        end_time = self.database_data.get(self.camera_id).get("end_time")
+                        config_options = {"start_time": start_time, "end_time": end_time}
+                        if self.frame_counters % 5 == 0:
+                            # await asyncio.to_thread(self.camera_processor.detect_person_in_polygon, frame, poly_info, rec_poly_info,config_options)
                             # Use a thread pool for CPU-bound tasks
                             loop = asyncio.get_running_loop()
                             await loop.run_in_executor(
                                 concurrent.futures.ThreadPoolExecutor(),
                                 self.camera_processor.detect_person_in_polygon,
-                                frame, poly_info, rec_poly_info
+                                frame, poly_info, rec_poly_info, config_options
                             )
                             self.frame_counters = 0
                         else:
-                            await asyncio.to_thread(self.camera_processor.from_box_person_in_polygon, frame, poly_info, rec_poly_info)
+                            await asyncio.to_thread(self.camera_processor.from_box_person_in_polygon, frame, poly_info, rec_poly_info, config_options)
 
                     _, buffer = cv2.imencode(".jpg", frame)
                     frame_bytes = buffer.tobytes()
                     yield (b'--frame\r\n' b'Content-Type: image/jpg\r\n\r\n' + frame_bytes + b'\r\n')
-
-
                 else:
                     # Set the flag to restart the stream
                     restart_stream = True
