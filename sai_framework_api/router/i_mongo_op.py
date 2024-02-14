@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import FileResponse
 from logic import mongo_op
 import json
-from logic.schemas.polygon_info_schemas import PolygonInfoSchemas
+from logic.schemas.polygon_info_schemas import PolygonInfoSchemas,CameraInfo
 
 router = APIRouter(prefix="/mongo_op", tags=["mongo_op"])
 
@@ -47,8 +47,6 @@ async def get_time_data():
     res = mongo_op.get_time_data()
     return res
 
-
-from logic.schemas.polygon_info_schemas import CameraInfo
 
 @router.post("/setup_registration")
 async def setup_registration(data: CameraInfo):

@@ -12,8 +12,8 @@ const NavbarCamCard = (props) => {
     const timeData = props.timeData;
     //let sDate = timeData ? timeData[camNo]["startTime"] : "00:00";
     //let eDate = timeData ? timeData[camNo]["endTime"] :"00:00";
-    const [startTime, setStartTime] = useState("00:00");
-    const [endTime, setEndTime] = useState("00:00");
+    const [startTime, setStartTime] = useState("00:01");
+    const [endTime, setEndTime] = useState("23:59");
 
     const handleDrawPolygon = () => {
         contextData.enableEditingPolygonStatusFn(true, camNo)
@@ -72,8 +72,8 @@ const NavbarCamCard = (props) => {
     };
 
     useEffect(() => {
-        let sDate = timeData?.[camNo]?.startTime || "00:00";
-        let eDate = timeData?.[camNo]?.endTime || "00:00";
+        let sDate = timeData?.[camNo]?.startTime || "00:01";
+        let eDate = timeData?.[camNo]?.endTime || "23:59";
         setStartTime(sDate);
         setEndTime(eDate);
     }, [props.timeData])
