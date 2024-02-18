@@ -1,7 +1,7 @@
 @echo off
 rem Set the title of the CMD window
 title SAI FASTAPI
-echo Creating virtual environment...
+echo Installing packages...
 
 rem Get the full path to the directory of the batch script
 set "script_dir=%~dp0"
@@ -25,4 +25,4 @@ rem Start the uvicorn server
 call uvicorn main:app --host 0.0.0.0 --port 8001
 
 echo uvicorn server started.
-pause
+
