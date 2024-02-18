@@ -25,7 +25,7 @@ names = yolo_model.model.names
 
 
 def is_current_time_in_range(start_time, end_time):
-    current_datetime = datetime.now()
+    current_datetime = datetime.datetime.now()
     start_datetime = current_datetime.replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0)
     end_datetime = current_datetime.replace(hour=end_time.hour, minute=end_time.minute, second=0, microsecond=0)
 
