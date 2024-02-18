@@ -19,6 +19,8 @@ confidence_threshold = 0.60
 
 def is_current_time_in_range(start_time, end_time):
     current_datetime = datetime.datetime.now()
+    start_time = datetime.datetime.strptime(start_time, "%H:%M")
+    end_time = datetime.datetime.strptime(end_time, "%H:%M")
     start_datetime = current_datetime.replace(hour=start_time.hour, minute=start_time.minute, second=0, microsecond=0)
     end_datetime = current_datetime.replace(hour=end_time.hour, minute=end_time.minute, second=0, microsecond=0)
 
