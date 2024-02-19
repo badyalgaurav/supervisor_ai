@@ -22,7 +22,7 @@ cd
 echo Current working directory: %cd%
 
 rem Start the uvicorn server
-call uvicorn main:app --host 0.0.0.0 --port 8001
+uvicorn main:app --host 0.0.0.0 --port 8001
 
 echo uvicorn server started.
 
