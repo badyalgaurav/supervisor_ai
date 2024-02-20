@@ -16,7 +16,7 @@ class FrameGenerator:
         # to get the database info periodically
         self.database_data = {}
         asyncio.create_task(self.fetch_data_periodically())
-
+        self.thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=5)
         self.camera_id = camera_id
         self.camera_processor = CameraProcessor(camera_id)
         self.url_rtsp = f'{url_rtsp}'
@@ -60,7 +60,7 @@ class FrameGenerator:
                             # Use a thread pool for CPU-bound tasks
                             loop = asyncio.get_running_loop()
                             await loop.run_in_executor(
-                                concurrent.futures.ThreadPoolExecutor(),
+                                self.thread_pool,
                                 self.camera_processor.detect_person_in_polygon,
                                 frame, poly_info, rec_poly_info, config_options
                             )
