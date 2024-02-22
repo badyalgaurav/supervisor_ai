@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-import cv2
-import asyncio
 from router.i_interface import router as api_router
 app = FastAPI()
 
