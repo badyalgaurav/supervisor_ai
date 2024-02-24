@@ -17,7 +17,7 @@ class FrameGenerator:
         # to get the database info periodically
         self.database_data = {}
         asyncio.create_task(self.fetch_data_periodically())
-        self.thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=5)
+        self.thread_pool = concurrent.futures.ThreadPoolExecutor()
         self.camera_id = camera_id
         self.camera_processor = CameraProcessor(camera_id)
         self.url_rtsp = f'{url_rtsp}'
