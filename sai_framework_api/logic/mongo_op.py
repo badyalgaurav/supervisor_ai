@@ -41,8 +41,8 @@ def get_alert_counts():
     client = GetClientUpdateByComapnyCode()
     db = client["supervisorAI"]
     coll = db["productionData"]
-    start_date = datetime.datetime.strptime(datetime.datetime.now().date().strftime("%y-%m-%d %H:%M:%S"), '%y-%m-%d %H:%M:%S') - datetime.timedelta(days=3)
-    end_date = start_date + datetime.timedelta(days=5)
+    start_date = datetime.datetime.strptime(datetime.datetime.now().date().strftime("%y-%m-%d %H:%M:%S"), '%y-%m-%d %H:%M:%S')
+    end_date = start_date + datetime.timedelta(days=1)
     # Perform the aggregation
     pipeline = [
         {
