@@ -52,7 +52,7 @@ class CameraProcessor:
         self.video_writer = None
 
     def detect_person_in_polygon(self, img, poly_info, rec_poly_info, config_options: dict):
-        results = self.model(img, stream=True, classes=0, conf=confidence_threshold, imgsz=320)
+        results = self.model(img, stream=True, classes=[0,1], conf=confidence_threshold, imgsz=320)
 
         self.is_person_in_danger = False
         self.frame_h_boxes = []
