@@ -26,7 +26,7 @@ async def video_feed(camera_id: int, conn_str: str, height: str, width: str):
     if camera_id not in frame_generators:
         # If FrameGenerator instance doesn't exist for this camera_id, create a new one
         # if camera_id==1:
-        #     url_rtsp = f'rtsp://admin:Trace3@123@192.168.1.64:554'
+        conn_str = f'rtsp://admin:Trace3@123@192.168.1.64:554'
         # else:
         #     url_rtsp = f'rtsp://admin:Trace3@123@192.168.1.65:554'
 
