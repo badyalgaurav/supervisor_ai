@@ -12,8 +12,11 @@ from logic.mongo_op import insert_events_db
 
 # from geofence.alarm import start_camera_alert, stop_camera_alert
 # from geofence.mongo_op import insert_events_db
-
+# export the model to ONNX format
+# yolo_model.export(format='onnx')
 yolo_model = YOLO("yolov8n.pt")
+
+
 confidence_threshold = 0.60
 
 
