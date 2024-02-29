@@ -47,10 +47,3 @@ async def get_time_data():
     res = mongo_op.get_time_data()
     return res
 
-
-@router.post("/setup_registration")
-async def setup_registration(data: CameraInfo):
-    # send the data to mongodb
-    mongo_op.setup_registration(data)
-
-    return {"message": "Form submitted successfully"}
