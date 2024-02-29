@@ -23,5 +23,6 @@ class Gemmiz:
     def get_camera_credentials(self, email: str, password: str):
         db = self.client["UUAABBDD"]
         coll = db["accountInfo"]
-        response = coll.find_one({"cEmail": email, "cPassword": password, "isActive": True}, {"_id": 0})
+        response = coll.find_one({"cEmail": email, "cPassword": password, "isActive": True})
+        response["_id"]=str(response["_id"])
         return response

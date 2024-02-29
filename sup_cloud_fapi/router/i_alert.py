@@ -7,8 +7,8 @@ alert_b = b_alert.Alert()
 
 
 @router.get("/get_alert_counts")
-async def get_alert_counts():
-    res = alert_b.get_alert_counts()
+async def get_alert_counts(user_id:str):
+    res = alert_b.get_alert_counts(user_id=user_id)
     return res
 
 

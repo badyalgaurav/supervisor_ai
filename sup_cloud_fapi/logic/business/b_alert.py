@@ -10,7 +10,7 @@ class Alert:
     def __init__(self):
         self.client = common.get_mongo_client()
 
-    def get_alert_counts(self):
+    def get_alert_counts(self, user_id: str):
         res = {"data": None, "message": "MSG_100"}
         db = self.client["UUAABBDD"]
         coll = db["productionData"]
@@ -20,7 +20,8 @@ class Alert:
         pipeline = [
             {
                 '$match': {
-                    'startTime': {'$lt': end_date, '$gte': start_date}
+                    'startTime': {'$lt': end_date, '$gte': start_date},
+                    "userId": user_id
                 }
             },
             {
