@@ -12,7 +12,7 @@ class Alert:
 
     def get_alert_counts(self):
         res = {"data": None, "message": "MSG_100"}
-        db = self.client["supervisorAI"]
+        db = self.client["UUAABBDD"]
         coll = db["productionData"]
         start_date = datetime.datetime.strptime(datetime.datetime.now().date().strftime("%y-%m-%d %H:%M:%S"), '%y-%m-%d %H:%M:%S')
         end_date = start_date + datetime.timedelta(days=1)
@@ -42,7 +42,7 @@ class Alert:
         start_date = parser.parse(start_date)
         end_date = parser.parse(end_date)
         res = {"data": None, "message": "MSG_100"}
-        db = self.client["supervisorAI"]
+        db = self.client["UUAABBDD"]
         coll = db["productionData"]
         if start_date == end_date:
             end_date = start_date + datetime.timedelta(days=1)

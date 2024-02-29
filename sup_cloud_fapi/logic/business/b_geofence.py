@@ -13,14 +13,14 @@ class Geofence:
 
     def get_polygon(self):
         res = {"data": None, "message": "MSG_100"}
-        db = self.client["supervisorAI"]
+        db = self.client["UUAABBDD"]
         coll = db["polygonInfo"]
         df = pd.DataFrame(coll.find({}, {"_id": 0})).to_json(orient="records")
         res["data"] = json.loads(df)
         return res
 
     def upsert_polygon(self, polygon_info: str, camera_no: int, start_time: Optional[str] = None, end_time: Optional[str] = None):
-        db = self.client["supervisorAI"]
+        db = self.client["UUAABBDD"]
         coll = db["polygonInfo"]
         coll_logs = db["polygonLogs"]
 
@@ -33,7 +33,7 @@ class Geofence:
 
     def get_time_data(self):
         res = {"data": None, "message": "MSG_100"}
-        db = self.client["supervisorAI"]
+        db = self.client["UUAABBDD"]
         coll = db["polygonInfo"]
         result = list(coll.find({}, {"_id": 0, "startTime": 1, "endTime": 1, "camera_no": 1}))
 
