@@ -36,6 +36,6 @@ async def get_time_data(user_id: str):
     return res
 
 @router.get("/insert_events_db")
-async def insert_events_db(camera_id, video_path, start_time, end_time):
+async def insert_events_db(user_id:str,camera_id:int, video_path:str, start_time:str, end_time:str):
     res = geofence_b.insert_events_db(user_id=user_id,camera_id=camera_id,video_path= video_path, start_time=start_time, end_time=end_time)
     return res

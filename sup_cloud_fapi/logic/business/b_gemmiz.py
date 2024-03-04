@@ -10,7 +10,7 @@ class Gemmiz:
         self.client = common.get_mongo_client()
 
     def setup_registration(self, data: CameraInfo):
-        db = self.client["UUAABBDD"]
+        db = self.client["UUAABBCC"]
         coll = db["accountInfo"]
         d_dict = data.dict()
         parse_camera_info = json.loads(d_dict["cameraInfo"])
@@ -21,8 +21,9 @@ class Gemmiz:
         return True
 
     def get_camera_credentials(self, email: str, password: str):
-        db = self.client["UUAABBDD"]
+        db = self.client["UUAABBCC"]
         coll = db["accountInfo"]
         response = coll.find_one({"cEmail": email, "cPassword": password, "isActive": True})
-        response["_id"]=str(response["_id"])
+        if response:
+            response["_id"] = str(response["_id"])
         return response

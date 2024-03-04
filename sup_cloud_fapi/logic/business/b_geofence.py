@@ -1,5 +1,5 @@
 from typing import Optional
-
+from dateutil import parser
 from logic.utility import common
 import pandas as pd
 import json
@@ -46,22 +46,25 @@ class Geofence:
         coll = db["polygonInfo"]
         df = pd.DataFrame(coll.find({"userId": user_id}, {"_id": 0}))
         # Loop over the rows using iterrows()
-        response = {}
+        # response = {}
 
-        for index, row in df.iterrows():
-            polygon_list = []
-            rec_poly_dict = {}
-            for polygon in row["polygonInfo"]:
-                result = Polygon([(item['x'], item['y']) for item in polygon.get("polygon")])
-                if polygon.get("label") == "recPoly":
-                    rec_poly_dict = result
-                else:
-                    polygon_list.append(result)
-            response[row.get("camera_no")] = {"polygon_list": polygon_list, "recPoly_dict": rec_poly_dict, "start_time": row.get("startTime"), "end_time": row.get("endTime")}
-        return response
+        # for index, row in df.iterrows():
+        #     polygon_list = []
+        #     rec_poly_dict = {}
+        #     for polygon in row["polygonInfo"]:
+        #         result = Polygon([(item['x'], item['y']) for item in polygon.get("polygon")])
+        #         if polygon.get("label") == "recPoly":
+        #             rec_poly_dict = result
+        #         else:
+        #             polygon_list.append(result)
+        #     response[row.get("camera_no")] = {"polygon_list": polygon_list, "recPoly_dict": rec_poly_dict, "start_time": row.get("startTime"), "end_time": row.get("endTime")}
+        res=json.loads(df.to_json(orient="records"))
+        return res
 
-    def insert_events_db(self, user_id, camera_id, video_path, start_time, end_time):
+    def insert_events_db(self, user_id: str, camera_id: int, video_path: str, start_time: str, end_time: str):
         db = self.client["UUAABBDD"]
         coll = db["productionData"]
+        start_time = parser.parse(start_time)
+        end_time = parser.parse(end_time)
         coll.insert_one({"userId": user_id, "cameraId": camera_id, "videoPath": video_path, "startTime": start_time, "endTime": end_time, "fileSize": -1})
         return True
