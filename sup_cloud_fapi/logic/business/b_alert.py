@@ -10,7 +10,7 @@ class Alert:
     def __init__(self):
         self.client = common.get_mongo_client()
 
-    def get_alert_counts(self):
+    def get_alert_counts(self, user_id: str):
         res = {"data": None, "message": "MSG_100"}
         db = self.client["UUAABBDD"]
         coll = db["productionData"]
@@ -20,7 +20,8 @@ class Alert:
         pipeline = [
             {
                 '$match': {
-                    'startTime': {'$lt': end_date, '$gte': start_date}
+                    'startTime': {'$lt': end_date, '$gte': start_date},
+                    "userId": user_id
                 }
             },
             {
@@ -38,7 +39,7 @@ class Alert:
         res["data"] = {i['cameraId']: i['count'] for i in result}
         return res
 
-    def get_alert_details(self, camera_id: int, start_date: str, end_date: str):
+    def get_alert_details(self, user_id: str, camera_id: int, start_date: str, end_date: str):
         start_date = parser.parse(start_date)
         end_date = parser.parse(end_date)
         res = {"data": None, "message": "MSG_100"}
@@ -47,7 +48,7 @@ class Alert:
         if start_date == end_date:
             end_date = start_date + datetime.timedelta(days=1)
 
-        df = pd.DataFrame(list(coll.find({'startTime': {'$lt': end_date, '$gte': start_date}, "cameraId": camera_id}, {"_id": 0})))
+        df = pd.DataFrame(list(coll.find({'startTime': {'$lt': end_date, '$gte': start_date}, "cameraId": camera_id, "userId": user_id}, {"_id": 0})))
         df = df.applymap(str)
         res["data"] = json.loads(df.to_json(orient="records"))
         return res
