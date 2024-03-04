@@ -31,11 +31,11 @@ def is_current_time_in_range(start_time, end_time):
 
 
 class CameraProcessor:
-    def __init__(self, camera_id):
+    def __init__(self, user_id,camera_id):
 
         self.start_time = None
         self.duration_per_file = 60 * 1  # 1 minutes in seconds
-
+        self.user_id=user_id
         self.camera_id = camera_id
         self.model = yolo_model
 
@@ -55,7 +55,7 @@ class CameraProcessor:
         self.video_writer = None
 
     def detect_person_in_polygon(self, img, poly_info, rec_poly_info, config_options: dict):
-        results = self.model(img, stream=True, classes=[0,1], conf=confidence_threshold, imgsz=320)
+        results = self.model(img, stream=True, classes=[0], conf=confidence_threshold, imgsz=320)
 
         self.is_person_in_danger = False
         self.frame_h_boxes = []
@@ -126,7 +126,7 @@ class CameraProcessor:
             self.person_state = 0  # Update state to indicate person is not in danger zone
 
     def insert_event(self, video_path, start_time, end_time):
-        insert_events_db(self.camera_id, video_path, start_time, end_time)
+        insert_events_db(self.user_id,self.camera_id, video_path, start_time, end_time)
         return "success"
 
     # def write_frame_to_disk_async(self, frame):

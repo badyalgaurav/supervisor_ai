@@ -6,7 +6,7 @@ import React, { useRef, useState, useEffect, useContext } from "react";
 import FabricJSCanvas from "../components/fabricJs/FabricJSCanvas"
 //import { MainContextProvider } from "../utils/MainContextProvider";
 //import { apiSAIFrameworkAPIPath, apiWebSocketPath } from "../config"
-const DashboardCamCard = ({ cameraId, height,width, connString }) => {
+const DashboardCamCard = ({ userId, cameraId, height, width, connString, aiPerSecondRatio }) => {
     debugger;
     //const contextData = useContext(MainContextProvider);
     //const canvasRef = useRef();
@@ -65,7 +65,7 @@ const DashboardCamCard = ({ cameraId, height,width, connString }) => {
                         {/*    src="https://picsum.photos/seed/picsum/200/300"*/}
                         {/*    style={{ height: '534px', width: '812px' }}*/}
                         {/*/>*/}
-                        <img src={`http://127.0.0.1:8000/video_feed?camera_id=${cameraId}&conn_str=${connString}&height=${height}&width=${width}`} alt={`Camera ${cameraId}`} style={{ width: `${width}px`, height: `${height}px` }} />
+                        <img src={`http://127.0.0.1:8000/video_feed?user_id=${userId}&camera_id=${cameraId}&conn_str=${connString}&height=${height}&width=${width}&ai_per_second=${aiPerSecondRatio}`} alt={`Camera ${cameraId}`} style={{ width: `${width}px`, height: `${height}px` }} />
                     </div>
                     <div style={{ position: 'absolute', top: 0, left: 0 }}>
                         <FabricJSCanvas cameraId={cameraId} height={height} width={width} />

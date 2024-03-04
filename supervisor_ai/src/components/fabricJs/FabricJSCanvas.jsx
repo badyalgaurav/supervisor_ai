@@ -19,15 +19,15 @@ const FabricJSCanvas = (props) => {
     const cameraId = props.cameraId;
     const height = props.height;
     const width = props.width;
+    
     const canvasId = 'canvas_' + cameraId;
 
     const [polyEditable, setPolyEditable] = useState(false);
     const fabricRef = React.useRef(null);
     const loadObjects = () => {
-        const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_polygon`; // Replace with your API endpoint URL
+        const apiUrl = `${apiSAIFrameworkAPIPath}/geofence/get_polygon`; // Replace with your API endpoint URL
         const requestData = {
-            // "camera_no": parseInt(cameraId)
-
+            "user_id": localStorage.getItem("userId")
         };
 
         axios.get(apiUrl, {
@@ -402,12 +402,13 @@ const FabricJSCanvas = (props) => {
         });
         localStorage.setItem("defaultObject", JSON.stringify(serializableObjects))
         console.log("Serialized objects:", JSON.stringify(serializableObjects));
-        const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/upsert_polygon/`;
+        const apiUrl = `${apiSAIFrameworkAPIPath}/geofence/upsert_polygon/`;
         const requestData = {
             "camera_no": parseInt(cameraId),
             "polygon_info": JSON.stringify(serializableObjects),
             "start_time": startTime ?? "00:00",
-            "end_time": endTime ?? "00:00"
+            "end_time": endTime ?? "00:00",
+            "user_id": localStorage.getItem("userId")
         };
 
         axios.post(apiUrl, requestData)

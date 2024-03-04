@@ -14,18 +14,20 @@ from logic.mongo_op import get_all_polygon
 
 
 class FrameGenerator:
-    def __init__(self, camera_id, url_rtsp, height, width):
+    def __init__(self, user_id, camera_id, url_rtsp, height, width, ai_per_second):
         # to get the database info periodically
         self.database_data = {}
         asyncio.create_task(self.fetch_data_periodically())
         self.thread_pool = concurrent.futures.ThreadPoolExecutor()
         self.camera_id = camera_id
-        self.camera_processor = CameraProcessor(camera_id)
+        self.user_id = user_id
+        self.camera_processor = CameraProcessor(user_id, camera_id)
         self.url_rtsp = f'{url_rtsp}'
         self.camera_streams = VideoStream(self.url_rtsp).start()
         self.frame_counters = 0
         self.height = int(height)
         self.width = int(width)
+        self.ai_per_second = ai_per_second if ai_per_second else 10
 
         # Create a dictionary to store thread termination flags
         self.thread_termination_flags = False
@@ -33,7 +35,7 @@ class FrameGenerator:
     async def fetch_data_periodically(self):
         while True:
             # Retrieve data from the database
-            new_data = get_all_polygon()  # Replace with your actual query
+            new_data = get_all_polygon(self.user_id)  # Replace with your actual query
             # Update the instance variable with the new data
             self.database_data = new_data
             # Sleep for 5 minutes before checking again
@@ -57,7 +59,8 @@ class FrameGenerator:
                         start_time = self.database_data.get(self.camera_id).get("start_time")
                         end_time = self.database_data.get(self.camera_id).get("end_time")
                         config_options = {"start_time": start_time, "end_time": end_time}
-                        if self.frame_counters % 5 == 0:
+                        # 5
+                        if self.frame_counters % self.ai_per_second == 0:
                             # await asyncio.to_thread(self.camera_processor.detect_person_in_polygon, frame, poly_info, rec_poly_info,config_options)
                             # Use a thread pool for CPU-bound tasks
                             loop = asyncio.get_running_loop()

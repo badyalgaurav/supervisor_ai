@@ -12,7 +12,7 @@ def GetClientUpdateByComapnyCode():
     return client
 
 
-def upsert_polygon(polygon_info: str, camera_no: int, start_time: Optional[str] = None, end_time: Optional[str] = None):
+def upsert_polygon(polygon_info: str, camera_no: int, start_time: Optional[str] = None, end_time: Optional[str] = None, user_id:Optional[str]=None):
     client = GetClientUpdateByComapnyCode()
     db = client["supervisorAI"]
     coll = db["polygonInfo"]
@@ -20,9 +20,9 @@ def upsert_polygon(polygon_info: str, camera_no: int, start_time: Optional[str] 
 
     coll.update_one({"camera_no": camera_no},
                     {"$set": {"polygonInfo": [{"polygon": poly.get("transformedPoints"), "label": poly.get("name")} for poly in polygon_info], "camera_no": camera_no, "polyRawInfo": polygon_info,
-                              "startTime": start_time, "endTime": end_time}}, upsert=True)
+                              "startTime": start_time, "endTime": end_time,"userId":user_id}}, upsert=True)
     coll_logs.insert_one({"polygonInfo": [{"polygon": poly.get("transformedPoints"), "label": poly.get("name")} for poly in polygon_info], "camera_no": camera_no, "polyRawInfo": polygon_info,
-                          "startTime": start_time, "endTime": end_time, "createdDateTime": datetime.datetime.now()})
+                          "startTime": start_time, "endTime": end_time,"userId":user_id, "createdDateTime": datetime.datetime.now()})
     return True
 
 

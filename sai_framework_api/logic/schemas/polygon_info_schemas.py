@@ -7,6 +7,7 @@ class PolygonInfoSchemas(BaseModel):
     polygon_info: Optional[str] = None
     start_time: Optional[str] = None
     end_time: Optional[str] = None
+    user_id: Optional[str] = None
 
 
 class CameraInfo(BaseModel):

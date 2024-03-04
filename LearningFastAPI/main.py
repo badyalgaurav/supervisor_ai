@@ -1,7 +1,5 @@
-
-
 from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -21,8 +19,13 @@ app.add_middleware(
 frame_generators = {}
 
 
+@app.get("/video")
+async def get_video(video_path):
+    return FileResponse(video_path, media_type="video/mp4")
+
+
 @app.get("/video_feed")
-async def video_feed(camera_id: int, conn_str: str, height: str, width: str):
+async def video_feed(user_id: str, camera_id: int, conn_str: str, height: str, width: str, ai_per_second:int):
     if camera_id not in frame_generators:
         # If FrameGenerator instance doesn't exist for this camera_id, create a new one
         # if camera_id==1:
@@ -30,7 +33,7 @@ async def video_feed(camera_id: int, conn_str: str, height: str, width: str):
         # else:
         #     url_rtsp = f'rtsp://admin:Trace3@123@192.168.1.65:554'
 
-        frame_generators[camera_id] = FrameGenerator(camera_id=camera_id, url_rtsp=conn_str, height=height, width=width)
+        frame_generators[camera_id] = FrameGenerator(user_id=user_id, camera_id=camera_id, url_rtsp=conn_str, height=height, width=width,ai_per_second=ai_per_second)
 
     frame_generator = frame_generators[camera_id]
     return StreamingResponse(frame_generator.generate_frames(), media_type="multipart/x-mixed-replace;boundary=frame")

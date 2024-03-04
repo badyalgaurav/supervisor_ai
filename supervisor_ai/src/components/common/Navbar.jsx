@@ -14,8 +14,13 @@ const Navbar = (props) => {
     useEffect(() => {
         // Function to make an Axios request
         const fetchData = () => {
-            const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_alert_counts/`;
-            axios.get(apiUrl)
+            const apiUrl = `${apiSAIFrameworkAPIPath}/alert/get_alert_counts/`;
+            const requestData = {
+                "user_id": localStorage.getItem("userId")
+            };
+            axios.get(apiUrl, {
+                params: requestData
+            })
                 .then((response) => {
                     setData(response.data.data);
                 })
@@ -24,8 +29,13 @@ const Navbar = (props) => {
                 });
         };
         const getTimeData = () => {
-            const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_time_data/`;
-            axios.get(apiUrl)
+            const apiUrl = `${apiSAIFrameworkAPIPath}/geofence/get_time_data/`;
+            const requestData = {
+                "user_id": localStorage.getItem("userId")
+            };
+            axios.get(apiUrl, {
+                params: requestData
+            })
                 .then((response) => {
                     setTimeData(response.data.data);
                 }) .catch((error) => {
@@ -88,7 +98,7 @@ const Navbar = (props) => {
             <div className={`sidebar pb-3 ${props.isOpen ? 'open' : ''}`}>
                 <nav class="navbar bg-secondary navbar-dark">
                     <div href="" class="navbar-brand mx-4 mb-3">
-                        <h3 class="text-primary">SafetyEyePro <span class="text-primary text-right"><i class="fa fa-power-off" aria-hidden="true" onClick={handleLogout }></i></span></h3>
+                        <h3 class="text-primary">SafetyEyePro <span class="text-default text-right" style={{color:"white"}}><i class="fa fa-power-off" aria-hidden="true" onClick={handleLogout }></i></span></h3>
                         
 
                     </div>

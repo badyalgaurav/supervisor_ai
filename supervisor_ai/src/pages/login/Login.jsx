@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiGemmiz } from "../../config"
+import { apiSAIFrameworkAPIPath } from "../../config"
 import Swal from "sweetalert2";
 import axios from 'axios';
 
@@ -9,7 +9,7 @@ const Login = () => {
     const handleLogin = () => {
         var email = document.querySelector('#txtEmail').value;
         var password = document.querySelector('#txtPassword').value;
-        const apiUrl = `${apiGemmiz}/geocam/get_camera_credentials`; // Replace with your API endpoint URL
+        const apiUrl = `${apiSAIFrameworkAPIPath}/gemmiz/get_camera_credentials`; // Replace with your API endpoint URL
         const requestData = {
             "email": email,
             "password": password
@@ -17,10 +17,10 @@ const Login = () => {
 
         axios.get(apiUrl, { params: requestData })
             .then((response) => {
-                debugger;
                 if (response.data) {
+                    localStorage.setItem("userId", response.data._id);
                     localStorage.setItem("email", response.data.cEmail);
-                    localStorage.setItem("password", response.data.cPassword);
+                    localStorage.setItem("aiPerSecond", response.data.aiPerSecondRatio);
                     localStorage.setItem("cameraInfo", JSON.stringify(response.data.cameraInfo));
 
                     Swal.fire({
