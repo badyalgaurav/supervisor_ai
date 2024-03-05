@@ -85,9 +85,9 @@ const Navbar = (props) => {
             if (result.isConfirmed) {
                 // Handle the deletion logic here
                 Swal.fire('Logout!', 'you are successfully logout.', 'success');
-                localStorage.removeItem("email");
-                localStorage.removeItem("password");
-                localStorage.removeItem("cameraInfo");
+
+                localStorage.clear();
+               
                 navigate('/Login');
             }
         });

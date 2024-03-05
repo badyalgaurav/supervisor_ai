@@ -1,11 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiSAIFrameworkAPIPath } from "../../config"
+import { apiSAIFrameworkAPIPath, apiWebSocketPath } from "../../config"
 import Swal from "sweetalert2";
 import axios from 'axios';
 
 const Login = () => {
     const navigate = useNavigate();
+
+    const getDimensions = (noOfCameras) => {
+        let response = { "height": 534, "width": 812 }
+        switch (noOfCameras) {
+            case 1:
+                response["height"] = 1068
+                response["width"] = 1624
+                break;
+            case 2:
+                response["height"] = 1068
+                break;
+
+            default:
+                return response;
+        }
+        return response;
+
+    }
+    const updateDimensions = (data) => {
+        const response = getDimensions(data.length)
+        const updatedData = data.map(item => {
+            item["height"] = response.height;
+            item["width"] = response.width;
+            return item; // Don't forget to return the modified item
+        });
+        return updatedData;
+
+    }
+
+    const handleInitAPI = (data) => {
+        const apiUrl = `${apiWebSocketPath}/init_api/`; // Replace with your API endpoint URL
+        data.cameraInfo = updateDimensions(data.cameraInfo);
+        // Assuming 'data' is an object with properties 'cameraInfo', '_id', and 'password'
+        data.cameraInfo.forEach((camera) => {
+            const requestData = {
+                "user_id": data._id,
+                "camera_id": camera.displayOrder,
+                "conn_str": camera.connectionString,
+                "height": camera.conn_str,
+                "width": camera.conn_str,
+                "ai_per_second": localStorage.getItem("aiPerSecondRatio")
+            };
+            axios.get(apiUrl, { params: requestData })
+                .then((response) => {
+                    console.log("API initialized successfully");
+                })
+                .catch((error) => {
+                    console.error("Error while initializing API", error);
+                });
+        });
+    }
     const handleLogin = () => {
         var email = document.querySelector('#txtEmail').value;
         var password = document.querySelector('#txtPassword').value;
@@ -20,9 +71,9 @@ const Login = () => {
                 if (response.data) {
                     localStorage.setItem("userId", response.data._id);
                     localStorage.setItem("email", response.data.cEmail);
-                    localStorage.setItem("aiPerSecond", response.data.aiPerSecondRatio);
+                    localStorage.setItem("aiPerSecondRatio", response.data.aiPerSecondRatio !== undefined ? response.data.aiPerSecondRatio : 8);
                     localStorage.setItem("cameraInfo", JSON.stringify(response.data.cameraInfo));
-
+                    handleInitAPI(response.data);
                     Swal.fire({
                         icon: "success",
                         title: "Sucess!",
@@ -31,7 +82,7 @@ const Login = () => {
                     navigate('/');
                 }
                 else {
-                   
+
                     Swal.fire({
                         icon: "warning",
                         title: "wrong credentials!",
