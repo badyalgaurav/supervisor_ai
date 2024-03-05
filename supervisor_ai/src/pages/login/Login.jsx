@@ -25,27 +25,28 @@ const Login = () => {
 
     }
     const updateDimensions = (data) => {
-        const response = getDimensions(data.length)
+        const response = getDimensions(data.length);
         const updatedData = data.map(item => {
             item["height"] = response.height;
             item["width"] = response.width;
-            return item; // Don't forget to return the modified item
+            return item;
         });
         return updatedData;
-
     }
 
     const handleInitAPI = (data) => {
-        const apiUrl = `${apiWebSocketPath}/init_api/`; // Replace with your API endpoint URL
+        debugger;
+        const apiUrl = `${apiWebSocketPath}/init_api/`;
         data.cameraInfo = updateDimensions(data.cameraInfo);
-        // Assuming 'data' is an object with properties 'cameraInfo', '_id', and 'password'
+
         data.cameraInfo.forEach((camera) => {
+            debugger;
             const requestData = {
                 "user_id": data._id,
                 "camera_id": camera.displayOrder,
                 "conn_str": camera.connectionString,
-                "height": camera.conn_str,
-                "width": camera.conn_str,
+                "height": camera.height, // Update height based on response
+                "width": camera.width,   // Update width based on response
                 "ai_per_second": localStorage.getItem("aiPerSecondRatio")
             };
             axios.get(apiUrl, { params: requestData })
@@ -74,12 +75,16 @@ const Login = () => {
                     localStorage.setItem("aiPerSecondRatio", response.data.aiPerSecondRatio !== undefined ? response.data.aiPerSecondRatio : 8);
                     localStorage.setItem("cameraInfo", JSON.stringify(response.data.cameraInfo));
                     handleInitAPI(response.data);
-                    Swal.fire({
-                        icon: "success",
-                        title: "Sucess!",
-                        text: "Successfully logged in.",
-                    });
-                    navigate('/');
+                   
+                    setTimeout(() => {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Sucess!",
+                            text: "Successfully logged in.",
+                        });
+                        navigate('/');
+                    }, 3000);
+                    
                 }
                 else {
 

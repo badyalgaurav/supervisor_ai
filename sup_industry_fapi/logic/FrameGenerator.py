@@ -31,6 +31,7 @@ class FrameGenerator:
 
         # Create a dictionary to store thread termination flags
         self.thread_termination_flags = False
+        self.display_frame = None
 
     async def fetch_data_periodically(self):
         while True:
@@ -124,7 +125,10 @@ class FrameGenerator:
                                 frame, poly_info, rec_poly_info, config_options
                             )
                             self.frame_counters = 0
+                        else:
+                            await asyncio.to_thread(self.camera_processor.from_box_person_in_polygon, frame, poly_info, rec_poly_info, config_options)
 
+                        self.display_frame = frame
                 else:
                     # Set the flag to restart the stream
                     restart_stream = True

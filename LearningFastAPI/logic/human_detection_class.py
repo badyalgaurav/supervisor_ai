@@ -34,7 +34,7 @@ class CameraProcessor:
     def __init__(self, user_id,camera_id):
 
         self.start_time = None
-        self.duration_per_file = 60 * 1  # 1 minutes in seconds
+        self.duration_per_file = 20 * 1  # 1 minutes in seconds
         self.user_id=user_id
         self.camera_id = camera_id
         self.model = yolo_model
