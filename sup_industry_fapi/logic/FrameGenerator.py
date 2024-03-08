@@ -24,6 +24,7 @@ class FrameGenerator:
         self.camera_processor = CameraProcessor(user_id, camera_id)
         self.url_rtsp = f'{url_rtsp}' if "rtsp" in url_rtsp else int(url_rtsp)
         self.camera_streams = VideoStream(self.url_rtsp).start()
+        # self.camera_streams =VideoStream(src=0, usePiCamera=False, resolution=(320, 240), framerate=32)
         self.frame_counters = 0
         self.height = int(height)
         self.width = int(width)

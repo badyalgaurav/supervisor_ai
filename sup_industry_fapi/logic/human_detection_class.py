@@ -34,7 +34,7 @@ class CameraProcessor:
     def __init__(self, user_id,camera_id):
 
         self.start_time = None
-        self.duration_per_file = 60 * 1  # 1 minutes in seconds
+        self.duration_per_file = 10 * 1  # 1 minutes in seconds
         self.user_id=user_id
         self.camera_id = camera_id
         self.model = yolo_model
@@ -55,6 +55,8 @@ class CameraProcessor:
         self.video_writer = None
 
     def detect_person_in_polygon(self, img, poly_info, rec_poly_info, config_options: dict):
+        # to hide the prediction results
+        # , verbose = False
         results = self.model(img, stream=True, classes=[0], conf=confidence_threshold, imgsz=320)
 
         self.is_person_in_danger = False
