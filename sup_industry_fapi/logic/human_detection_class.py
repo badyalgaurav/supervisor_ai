@@ -14,7 +14,8 @@ from logic.mongo_op import insert_events_db
 # from geofence.mongo_op import insert_events_db
 # export the model to ONNX format
 # yolo_model.export(format='onnx')
-yolo_model = YOLO("yolov8n.pt")
+BASE_ADDRESS="logic"
+yolo_model = YOLO(f"{BASE_ADDRESS}/predictionModel.pt")
 
 
 confidence_threshold = 0.60

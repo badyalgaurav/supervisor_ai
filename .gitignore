@@ -407,6 +407,7 @@ FodyWeavers.xsd
 
 # production
 /build
+supervisor_ai/build/
 
 # misc
 .DS_Store
