@@ -14,9 +14,27 @@ from logic.mongo_op import insert_events_db
 # from geofence.mongo_op import insert_events_db
 # export the model to ONNX format
 # yolo_model.export(format='onnx')
+
+#region DEBUGGING PATH
 BASE_ADDRESS="logic"
 yolo_model = YOLO(f"{BASE_ADDRESS}/predictionModel.pt")
+#endregion 
 
+#region ABSOLUTION PATH
+# # Get the absolute path of the directory containing the current script
+# script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# # Specify the name of the directory containing the model file
+# BASE_ADDRESS = "logic"
+
+# # Construct the absolute path to the model file
+# model_path = os.path.join(script_dir, BASE_ADDRESS, "predictionModel.pt")
+
+
+# # Use the absolute path to load the model
+# yolo_model = YOLO(model_path)
+
+#endregion
 
 confidence_threshold = 0.60
 
