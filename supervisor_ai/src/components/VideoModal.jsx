@@ -9,6 +9,7 @@ const VideoModal = ({ isOpen, videoUrl, onRequestClose }) => {
     const videoRef = useRef(null);
 
     const f_path = `${apiWebSocketPath}/video/?video_path=${videoUrl}`;
+    //const f_path = `${apiWebSocketPath}/video/?video_path=D:/var/www/output_camera_0/20240313/output_camera_0_20240313114115.mp4`;
 
     const handleVideoLoadedData = () => {
         // Video metadata has been loaded

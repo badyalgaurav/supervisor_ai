@@ -23,7 +23,14 @@ class FrameGenerator:
         self.user_id = user_id
         self.camera_processor = CameraProcessor(user_id, camera_id)
         self.url_rtsp = f'{url_rtsp}' if "rtsp" in url_rtsp else int(url_rtsp)
-        self.camera_streams = VideoStream(self.url_rtsp).start()
+        try:
+            self.camera_streams = VideoStream(self.url_rtsp).start()
+            if self.camera_streams.grabbed:
+                print("SUCCESS: successfully initialized")
+            else:
+                print("WARNING: please check the camera connection. For testing you can use VLC player's IP Camera player option.")
+        except Exception as e:
+            print("ERROR:", e)
         # self.camera_streams = VideoStream(0).start()
         # self.camera_streams =VideoStream(src=0, usePiCamera=False, resolution=(320, 240), framerate=32)
         self.frame_counters = 0
@@ -106,7 +113,7 @@ class FrameGenerator:
 
     async def generate_frames_bg(self):
         try:
-            restart_stream = False
+            # restart_stream = False
             while not self.thread_termination_flags:
                 frame = self.camera_streams.read()
                 if frame is not None:
@@ -130,20 +137,22 @@ class FrameGenerator:
                         else:
                             await asyncio.to_thread(self.camera_processor.from_box_person_in_polygon, frame, poly_info, rec_poly_info, config_options)
 
-                        self.display_frame = frame
+                    self.display_frame = frame
                 else:
-                    # Set the flag to restart the stream
-                    restart_stream = True
-                if restart_stream:
-                    # Stop the current stream
-                    self.camera_streams.stop()
-                    self.camera_streams.stream.release()
-                    # Introduce a delay before reinitializing
-                    time.sleep(10)
-                    # Reinitialize the video stream
-                    self.camera_streams = VideoStream(self.url_rtsp).start()
-                    # Reset the restart flag
-                    restart_stream = False
+                    print("no frame capture")
+                # else:
+                #     # Set the flag to restart the stream
+                #     restart_stream = True
+                # if restart_stream:
+                #     # Stop the current stream
+                #     self.camera_streams.stop()
+                #     self.camera_streams.stream.release()
+                #     # Introduce a delay before reinitializing
+                #     time.sleep(10)
+                #     # Reinitialize the video stream
+                #     self.camera_streams = VideoStream(self.url_rtsp).start()
+                #     # Reset the restart flag
+                #     restart_stream = False
 
         except Exception as e:
             print(f"Exception: {e}")

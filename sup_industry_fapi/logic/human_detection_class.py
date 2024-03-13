@@ -185,7 +185,10 @@ class CameraProcessor:
 
     def generate_video_writer(self, frame):
         frame_height, frame_width, _ = frame.shape
-        fourcc = cv2.VideoWriter_fourcc(*'h264')
+
+        # Set the codec explicitly to avoid FFMPEG fallback
+        fourcc = cv2.VideoWriter_fourcc(*'avc1')
+        # fourcc = cv2.VideoWriter_fourcc(*'h264')
         # fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # cv2.VideoWriter_fourcc(*'h264')
         # fourcc = cv2.VideoWriter_fourcc(*"MJPG")  # cv2.VideoWriter_fourcc(*'h264')
         # fourcc = cv2.VideoWriter_fourcc(*"avc1")  # cv2.VideoWriter_fourcc(*'h264')

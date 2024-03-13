@@ -2,7 +2,7 @@ import datetime
 
 import cv2
 import os
-from ultralytics import YOLO
+from ultralytics import NAS,YOLO
 import time
 
 from shapely.geometry import box as box_shape

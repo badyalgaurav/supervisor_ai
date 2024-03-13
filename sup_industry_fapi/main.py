@@ -45,13 +45,16 @@ async def video_feed_bg(user_id: str, camera_id: int, conn_str: str, height: str
 @app.get("/video_feed")
 async def video_feed(user_id: str, camera_id: int, conn_str: str, height: str, width: str, ai_per_second: int, background_tasks: BackgroundTasks):
     async def generate():
-        while True:
-            frame = frame_generators[camera_id].display_frame
-            if frame is not None:
-                _, buffer = cv2.imencode(".jpg", frame)
-                frame_bytes = buffer.tobytes()
-                yield (b'--frame\r\n' b'Content-Type: image/jpg\r\n\r\n' + frame_bytes + b'\r\n')
-            await asyncio.sleep(0.001)  # Adjust sleep time as needed
+        try:
+            while True:
+                frame = frame_generators[camera_id].display_frame
+                if frame is not None:
+                    _, buffer = cv2.imencode(".jpg", frame)
+                    frame_bytes = buffer.tobytes()
+                    yield (b'--frame\r\n' b'Content-Type: image/jpg\r\n\r\n' + frame_bytes + b'\r\n')
+                await asyncio.sleep(0.001)  # Adjust sleep time as needed
+        except Exception as e:
+            print(f"ERROR: {e}")
 
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace;boundary=frame")
 

@@ -23,7 +23,15 @@ class FrameGenerator:
         self.user_id = user_id
         self.camera_processor = CameraProcessor(user_id, camera_id)
         self.url_rtsp = f'{url_rtsp}' if "rtsp" in url_rtsp else int(url_rtsp)
-        self.camera_streams = VideoStream(self.url_rtsp).start()
+        try:
+            self.camera_streams = VideoStream(0).start()
+            if self.camera_streams.grabbed:
+                print("SUCCESS: successfully initialized")
+            else:
+                print("WARNING: please check the camera connection. For testing you can use VLC player's IP Camera player option.")
+        except Exception as e:
+            print("ERROR:", e)
+
         self.frame_counters = 0
         self.height = int(height)
         self.width = int(width)
@@ -128,7 +136,7 @@ class FrameGenerator:
                         else:
                             await asyncio.to_thread(self.camera_processor.from_box_person_in_polygon, frame, poly_info, rec_poly_info, config_options)
 
-                        self.display_frame = frame
+                    self.display_frame = frame
                 else:
                     # Set the flag to restart the stream
                     restart_stream = True

@@ -45,12 +45,18 @@ async def video_feed_bg(user_id: str, camera_id: int, conn_str: str, height: str
 async def video_feed(user_id: str, camera_id: int, conn_str: str, height: str, width: str, ai_per_second: int, background_tasks: BackgroundTasks):
     async def generate():
         while True:
-            frame = frame_generators[camera_id].display_frame
+            try:
+                frame = frame_generators[camera_id].display_frame
+            except KeyError as e:
+                init_api(user_id, camera_id, conn_str, height, width, ai_per_second)
+            except Exception as e:
+                print("Error occurred during initialization:", e)
+
             if frame is not None:
                 _, buffer = cv2.imencode(".jpg", frame)
                 frame_bytes = buffer.tobytes()
                 yield (b'--frame\r\n' b'Content-Type: image/jpg\r\n\r\n' + frame_bytes + b'\r\n')
-                await asyncio.sleep(0.001)  # Adjust sleep time as needed
+            await asyncio.sleep(0.001)  # Adjust sleep time as needed
 
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace;boundary=frame")
 
