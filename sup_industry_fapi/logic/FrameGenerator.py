@@ -4,7 +4,7 @@ import asyncio
 import concurrent.futures
 from logic.human_detection_class import CameraProcessor
 from logic.mongo_op import get_all_polygon
-
+import time
 
 class FrameGenerator:
     def __init__(self, user_id, camera_id, url_rtsp, height, width, ai_per_second):
@@ -72,20 +72,18 @@ class FrameGenerator:
 
                     self.display_frame = frame
                 else:
-                    print("no frame capture")
-                # else:
-                #     # Set the flag to restart the stream
-                #     restart_stream = True
-                # if restart_stream:
-                #     # Stop the current stream
-                #     self.camera_streams.stop()
-                #     self.camera_streams.stream.release()
-                #     # Introduce a delay before reinitializing
-                #     time.sleep(10)
-                #     # Reinitialize the video stream
-                #     self.camera_streams = VideoStream(self.url_rtsp).start()
-                #     # Reset the restart flag
-                #     restart_stream = False
+                    # Set the flag to restart the stream
+                    restart_stream = True
+                if restart_stream:
+                    # Stop the current stream
+                    self.camera_streams.stop()
+                    self.camera_streams.stream.release()
+                    # Introduce a delay before reinitializing
+                    time.sleep(60*30)
+                    # Reinitialize the video stream
+                    self.camera_streams = VideoStream(self.url_rtsp).start()
+                    # Reset the restart flag
+                    restart_stream = False
 
         except Exception as e:
             print(f"Exception: {e}")
@@ -93,6 +91,7 @@ class FrameGenerator:
             import traceback
             traceback.print_exc()
             pass
-        # finally:
-        #     await asyncio.to_thread(self.camera_processor.release_video_writer)
-        #     self.camera_streams.stream.release()
+        finally:
+            # await asyncio.to_thread(self.camera_processor.release_video_writer)
+            self.camera_streams.stop()
+            self.camera_streams.stream.release()

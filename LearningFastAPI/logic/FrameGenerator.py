@@ -145,7 +145,7 @@ class FrameGenerator:
                     self.camera_streams.stop()
                     self.camera_streams.stream.release()
                     # Introduce a delay before reinitializing
-                    time.sleep(10)
+                    time.sleep(60*30)
                     # Reinitialize the video stream
                     self.camera_streams = VideoStream(self.url_rtsp).start()
                     # Reset the restart flag
