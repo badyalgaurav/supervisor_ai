@@ -1,13 +1,14 @@
 // Example for draw polygon
 //reference https://www.jsdelivr.com/package/npm/react-draw-polygons
 import React, { useRef, useState, useEffect, useContext } from "react";
+import { useNavigate } from 'react-router-dom';
 //import axios from 'axios';
 //import Swal from "sweetalert2";
 import FabricJSCanvas from "../components/fabricJs/FabricJSCanvas"
 //import { MainContextProvider } from "../utils/MainContextProvider";
 import { apiWebSocketPath } from "../config"
 const DashboardCamCard = ({ userId, cameraId, height, width, connString, aiPerSecondRatio }) => {
-    debugger;
+    const navigate = useNavigate();
     //const contextData = useContext(MainContextProvider);
     //const canvasRef = useRef();
     //const polygons = JSON.parse(localStorage.getItem(`polyFor_${cameraId}`));//contextData.polygonInfo;
@@ -20,8 +21,8 @@ const DashboardCamCard = ({ userId, cameraId, height, width, connString, aiPerSe
     //};
 
     //const handSavePolygon = (cameraId, polygonInfo) => {
-        
-    //    const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/upsert_polygon/`; 
+
+    //    const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/upsert_polygon/`;
     //    const requestData = {
     //        "camera_no": parseInt(cameraId),
     //        "polygon_info": polygonInfo,
@@ -41,7 +42,7 @@ const DashboardCamCard = ({ userId, cameraId, height, width, connString, aiPerSe
 
     // This function will be called whenever contextData changes
     //useEffect(() => {
-        
+
     //    // Execute your desired function here
     //    console.log('Context Data has changed:', contextData.updatePolygonStatus);
     //    if (contextData.updatePolygonStatus[parseInt(cameraId) - 1] == true) {
@@ -55,6 +56,11 @@ const DashboardCamCard = ({ userId, cameraId, height, width, connString, aiPerSe
 
     //}, [contextData]);
 
+    const handleImageErro = () => {
+        console.log("frames are empty for this camera.");
+        alert("Camera is not connected or Service is stopped. Please check and log in again.");
+        navigate('/login');
+    }
 
     return (
         <div class="card d-flex flex-column h-100">
@@ -65,7 +71,7 @@ const DashboardCamCard = ({ userId, cameraId, height, width, connString, aiPerSe
                         {/*    src="https://picsum.photos/seed/picsum/200/300"*/}
                         {/*    style={{ height: '534px', width: '812px' }}*/}
                         {/*/>*/}
-                        <img src={`${apiWebSocketPath}/video_feed?user_id=${userId}&camera_id=${cameraId}&conn_str=${connString}&height=${height}&width=${width}&ai_per_second=${aiPerSecondRatio}`} alt={`Camera ${cameraId}`} style={{ width: `${width}px`, height: `${height}px` }} />
+                        <img src={`${apiWebSocketPath}/video_feed?user_id=${userId}&camera_id=${cameraId}&conn_str=${connString}&height=${height}&width=${width}&ai_per_second=${aiPerSecondRatio}`} alt={`Camera ${cameraId}`} style={{ width: `${width}px`, height: `${height}px` }} onError={handleImageErro } />
                     </div>
                     <div style={{ position: 'absolute', top: 0, left: 0 }}>
                         <FabricJSCanvas cameraId={cameraId} height={height} width={width} />

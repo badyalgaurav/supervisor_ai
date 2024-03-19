@@ -25,7 +25,10 @@ for camera_id in range(1, 5):
 def play_camera_sound(camera_id):
     # print(f"Playing sound for camera {camera_id}")
     while not camera_events[camera_id].is_set():
-        sound_files[camera_id].play()
+        try:
+            sound_files[camera_id].play()
+        except:
+            sound_files[1].play()
 
 
 # Function to start the sound alert for a specific camera

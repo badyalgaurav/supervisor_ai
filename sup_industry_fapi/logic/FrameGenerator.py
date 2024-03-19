@@ -6,6 +6,7 @@ from logic.human_detection_class import CameraProcessor
 from logic.mongo_op import get_all_polygon
 import time
 
+
 class FrameGenerator:
     def __init__(self, user_id, camera_id, url_rtsp, height, width, ai_per_second):
         # to get the database info periodically
@@ -46,7 +47,7 @@ class FrameGenerator:
 
     async def generate_frames_bg(self):
         try:
-            # restart_stream = False
+            restart_stream = False
             while not self.thread_termination_flags:
                 frame = self.camera_streams.read()
                 if frame is not None:
@@ -79,7 +80,7 @@ class FrameGenerator:
                     self.camera_streams.stop()
                     self.camera_streams.stream.release()
                     # Introduce a delay before reinitializing
-                    time.sleep(60*30)
+                    time.sleep(10)
                     # Reinitialize the video stream
                     self.camera_streams = VideoStream(self.url_rtsp).start()
                     # Reset the restart flag

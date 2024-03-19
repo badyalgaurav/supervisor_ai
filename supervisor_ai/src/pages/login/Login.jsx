@@ -49,7 +49,8 @@ const Login = () => {
                 "width": camera.width,   // Update width based on response
                 "ai_per_second": localStorage.getItem("aiPerSecondRatio")
             };
-            axios.get(apiUrl, { params: requestData })
+            //axios.get(apiUrl, { params: requestData })
+            axios.post(apiUrl, requestData)
                 .then((response) => {
                     console.log("API initialized successfully");
                 })
@@ -75,7 +76,7 @@ const Login = () => {
                     localStorage.setItem("aiPerSecondRatio", response.data.aiPerSecondRatio !== undefined ? response.data.aiPerSecondRatio : 8);
                     localStorage.setItem("cameraInfo", JSON.stringify(response.data.cameraInfo));
                     handleInitAPI(response.data);
-                   
+
                     setTimeout(() => {
                         Swal.fire({
                             icon: "success",
@@ -84,7 +85,7 @@ const Login = () => {
                         });
                         navigate('/');
                     }, 3000);
-                    
+
                 }
                 else {
 

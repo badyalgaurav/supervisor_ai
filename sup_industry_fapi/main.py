@@ -8,6 +8,7 @@ import cv2
 from starlette.background import BackgroundTasks
 
 from logic.FrameGenerator import FrameGenerator
+from logic.schemas.init_inp_schemas import InitInpSchemas
 
 app = FastAPI()
 app.add_middleware(
@@ -28,10 +29,9 @@ async def get_video(video_path):
     return FileResponse(video_path, media_type="video/mp4")
 
 
-@app.get("/init_api")
-async def init_api(user_id: str, camera_id: int, conn_str: str, height: str, width: str, ai_per_second: int, background_tasks: BackgroundTasks):
-    # conn_str="0"
-    background_tasks.add_task(video_feed_bg, user_id, camera_id, conn_str, height, width, ai_per_second)
+@app.post("/init_api")
+async def init_api(model: InitInpSchemas, background_tasks: BackgroundTasks):
+    background_tasks.add_task(video_feed_bg, model.user_id, model.camera_id, model.conn_str, model.height, model.width, model.ai_per_second)
     return "success"
 
 
@@ -55,6 +55,7 @@ async def video_feed(user_id: str, camera_id: int, conn_str: str, height: str, w
                 await asyncio.sleep(0.001)  # Adjust sleep time as needed
         except Exception as e:
             print(f"ERROR: {e}")
+            raise Exception("An error occurred while generating frames")
 
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace;boundary=frame")
 

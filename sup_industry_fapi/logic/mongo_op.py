@@ -9,26 +9,29 @@ SUP_API_URL = "http://interx.ai/api_sup"
 
 
 def get_all_polygon(user_id: str):
-    url = f"{SUP_API_URL}/geofence/get_all_polygon"
-    data = {"user_id": user_id}
-    response = requests.get(url, data)
     res = {}
-    if response.status_code == 200:
-        result = response.json()
-        df = pd.DataFrame(result)
-        for index, row in df.iterrows():
-            polygon_list = []
-            rec_poly_dict = {}
-            for polygon in row["polygonInfo"]:
-                result = Polygon([(item['x'], item['y']) for item in polygon.get("polygon")])
-                if polygon.get("label") == "recPoly":
-                    rec_poly_dict = result
-                else:
-                    polygon_list.append(result)
-            res[row.get("camera_no")] = {"polygon_list": polygon_list, "recPoly_dict": rec_poly_dict, "start_time": row.get("startTime"), "end_time": row.get("endTime")}
-    else:
-        print(f"Failed to send data. Status code: {response.status_code}")
-        print("Error message:", response.text)
+    try:
+        url = f"{SUP_API_URL}/geofence/get_all_polygon"
+        data = {"user_id": user_id}
+        response = requests.get(url, data)
+        if response.status_code == 200:
+            result = response.json()
+            df = pd.DataFrame(result)
+            for index, row in df.iterrows():
+                polygon_list = []
+                rec_poly_dict = {}
+                for polygon in row["polygonInfo"]:
+                    result = Polygon([(item['x'], item['y']) for item in polygon.get("polygon")])
+                    if polygon.get("label") == "recPoly":
+                        rec_poly_dict = result
+                    else:
+                        polygon_list.append(result)
+                res[row.get("camera_no")] = {"polygon_list": polygon_list, "recPoly_dict": rec_poly_dict, "start_time": row.get("startTime"), "end_time": row.get("endTime")}
+        else:
+            print(f"Failed to send data. Status code: {response.status_code}")
+            print("Error message:", response.text)
+    except Exception as e:
+        print(f"ERROR: ${e}")
     return res
 
 
