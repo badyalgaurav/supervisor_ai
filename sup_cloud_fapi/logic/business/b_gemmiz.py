@@ -1,4 +1,7 @@
 import datetime
+
+from bson import ObjectId
+
 from logic.schemas.camera_schemas import CameraInfo
 from logic.utility import common
 import json
@@ -24,6 +27,14 @@ class Gemmiz:
         db = self.client["UUAABBCC"]
         coll = db["accountInfo"]
         response = coll.find_one({"cEmail": email, "cPassword": password, "isActive": True})
+        if response:
+            response["_id"] = str(response["_id"])
+        return response
+
+    def get_user_info_by_id(self, user_id: str):
+        db = self.client["UUAABBCC"]
+        coll = db["accountInfo"]
+        response = coll.find_one({"_id": ObjectId(user_id), "isActive": True})
         if response:
             response["_id"] = str(response["_id"])
         return response
