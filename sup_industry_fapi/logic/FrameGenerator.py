@@ -43,7 +43,7 @@ class FrameGenerator:
             # Update the instance variable with the new data
             self.database_data = new_data
             # Sleep for 5 minutes before checking again
-            await asyncio.sleep(30)  # 300 seconds = 5 minutes
+            await asyncio.sleep(300)  # 300 seconds = 5 minutes
 
     async def generate_frames_bg(self):
         try:
