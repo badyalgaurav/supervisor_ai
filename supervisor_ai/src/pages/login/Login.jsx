@@ -1,15 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiGemmiz } from "../../config"
+import { apiSAIFrameworkAPIPath, apiWebSocketPath } from "../../config"
 import Swal from "sweetalert2";
 import axios from 'axios';
 
 const Login = () => {
     const navigate = useNavigate();
+
+    const getDimensions = (noOfCameras) => {
+        let response = { "height": 534, "width": 812 }
+        switch (noOfCameras) {
+            case 1:
+                response["height"] = 1068
+                response["width"] = 1624
+                break;
+            case 2:
+                response["height"] = 1068
+                break;
+
+            default:
+                return response;
+        }
+        return response;
+
+    }
+    const updateDimensions = (data) => {
+        const response = getDimensions(data.length);
+        const updatedData = data.map(item => {
+            item["height"] = response.height;
+            item["width"] = response.width;
+            return item;
+        });
+        return updatedData;
+    }
+
+    const handleInitAPI = (data) => {
+        debugger;
+        const apiUrl = `${apiWebSocketPath}/init_api/`;
+        data.cameraInfo = updateDimensions(data.cameraInfo);
+
+        data.cameraInfo.forEach((camera) => {
+            debugger;
+            const requestData = {
+                "user_id": data._id,
+                "camera_id": camera.displayOrder,
+                "conn_str": camera.connectionString,
+                "height": camera.height, // Update height based on response
+                "width": camera.width,   // Update width based on response
+                "ai_per_second": localStorage.getItem("aiPerSecondRatio")
+            };
+            //axios.get(apiUrl, { params: requestData })
+            axios.post(apiUrl, requestData)
+                .then((response) => {
+                    console.log("API initialized successfully");
+                })
+                .catch((error) => {
+                    console.error("Error while initializing API", error);
+                });
+        });
+    }
     const handleLogin = () => {
         var email = document.querySelector('#txtEmail').value;
         var password = document.querySelector('#txtPassword').value;
-        const apiUrl = `${apiGemmiz}/geocam/get_camera_credentials`; // Replace with your API endpoint URL
+        const apiUrl = `${apiSAIFrameworkAPIPath}/gemmiz/get_camera_credentials`; // Replace with your API endpoint URL
         const requestData = {
             "email": email,
             "password": password
@@ -17,21 +70,25 @@ const Login = () => {
 
         axios.get(apiUrl, { params: requestData })
             .then((response) => {
-                debugger;
                 if (response.data) {
+                    localStorage.setItem("userId", response.data._id);
                     localStorage.setItem("email", response.data.cEmail);
-                    localStorage.setItem("password", response.data.cPassword);
+                    localStorage.setItem("aiPerSecondRatio", response.data.aiPerSecondRatio !== undefined ? response.data.aiPerSecondRatio : 8);
                     localStorage.setItem("cameraInfo", JSON.stringify(response.data.cameraInfo));
+                    handleInitAPI(response.data);
 
-                    Swal.fire({
-                        icon: "success",
-                        title: "Sucess!",
-                        text: "Successfully logged in.",
-                    });
-                    navigate('/');
+                    setTimeout(() => {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Sucess!",
+                            text: "Successfully logged in.",
+                        });
+                        navigate('/');
+                    }, 3000);
+
                 }
                 else {
-                   
+
                     Swal.fire({
                         icon: "warning",
                         title: "wrong credentials!",

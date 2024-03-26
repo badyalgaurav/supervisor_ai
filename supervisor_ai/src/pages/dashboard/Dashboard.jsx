@@ -77,8 +77,8 @@ const Dashboard = () => {
                     {/*Map over the data and render each item*/}
                         {
                             data.map((item) => (
-                        <div class={divClass}>
-                            <DashboardCamCard cameraId={item.displayOrder} height={item.height} width={item.width} connString={item.connectionString}></DashboardCamCard>
+                                <div class={divClass}>
+                                    <DashboardCamCard userId={localStorage.getItem("userId")} cameraId={item.displayOrder} height={item.height} width={item.width} connString={item.connectionString} aiPerSecondRatio={localStorage.getItem("aiPerSecondRatio")} ></DashboardCamCard>
                         </div>
                     ))}
                 </>

@@ -196,7 +196,7 @@ def handle_person_not_in_warning(camera_id, frame):
         recording_thread.daemon = True
         recording_thread.start()
         insert_event(camera_id=camera_id, video_path=video_path,
-                     start_time=IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id], end_time=end_time)
+                     start_time=str(IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id]), end_time=str(end_time))
         IS_PERSON_REMAIN_IN_DANGER[camera_id] = False
         IS_PERSON_REMAIN_IN_DANGER_START_TIME[camera_id] = ""
         # if not IS_PERSON_IN_DANGER[camera_id]:

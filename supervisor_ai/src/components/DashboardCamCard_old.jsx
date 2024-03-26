@@ -105,7 +105,7 @@ const DashboardCamCard = ({ cameraId }) => {
                         cornerSize: 10,
                     }}>
                     {/*<div> <img src={imageSrc} alt={`Camera ${cameraId}`} style={{ height: "534px", width: "812px" }} /> </div>*/}
-                    <div> <img src={`http://127.0.0.1:8000/video_feed?camera_id=${cameraId}`} alt={`Camera ${cameraId}`} style={{ height: "534px", width: "812px" }} /> </div>
+                    <div> <img src={`${apiWebSocketPath}/video_feed?camera_id=${cameraId}`} alt={`Camera ${cameraId}`} style={{ height: "534px", width: "812px" }} /> </div>
                 </CanvasPolygons>
             </div>
         </div>

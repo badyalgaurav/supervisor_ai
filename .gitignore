@@ -407,6 +407,7 @@ FodyWeavers.xsd
 
 # production
 /build
+supervisor_ai/build/
 
 # misc
 .DS_Store
@@ -418,3 +419,4 @@ FodyWeavers.xsd
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+sup_industry_fapi/main.spec

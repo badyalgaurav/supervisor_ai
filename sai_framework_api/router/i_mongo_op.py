@@ -29,7 +29,7 @@ async def get_alert_details(camera_id: int, start_date: str, end_date: str):
 async def upsert_polygon(model: PolygonInfoSchemas):
     camera_no = model.camera_no
     polygon_info = json.loads(model.polygon_info)
-    res = mongo_op.upsert_polygon(camera_no=camera_no, polygon_info=polygon_info, start_time=model.start_time, end_time=model.end_time)
+    res = mongo_op.upsert_polygon(camera_no=camera_no, polygon_info=polygon_info, start_time=model.start_time, end_time=model.end_time,user_id=model.user_id)
 
     return res
 

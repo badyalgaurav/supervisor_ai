@@ -51,8 +51,9 @@ const AlertEventsReport = () => {
     // Function to handle date range selection
 
     const handleGetData = () => {
-        const apiUrl = `${apiSAIFrameworkAPIPath}/mongo_op/get_alert_details/`; // Replace with your API endpoint URL
+        const apiUrl = `${apiSAIFrameworkAPIPath}/alert/get_alert_details/`; // Replace with your API endpoint URL
         const requestData = {
+            "user_id": localStorage.getItem("userId"),
             "camera_id": parseInt(cameraId),
             "start_date": moment(startDate).format('YYYY-MM-DD'),
             "end_date": moment(endDate).format('YYYY-MM-DD'),
