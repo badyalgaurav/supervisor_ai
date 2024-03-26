@@ -17,3 +17,14 @@ async def setup_registration(data: CameraInfo):
 async def get_camera_credentials(email: str, password: str):
     res = gemmiz_b.get_camera_credentials(email, password)
     return res
+
+
+@router.get("/get_user_info_by_id")
+def get_user_info_by_id(user_id: str):
+    res = gemmiz_b.get_user_info_by_id(user_id)
+    return res
+
+
+
+
+
