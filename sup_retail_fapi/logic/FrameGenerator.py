@@ -19,7 +19,7 @@ class FrameGenerator:
         try:
             self.camera_streams = VideoStream(self.url_rtsp).start()
             if self.camera_streams.grabbed:
-                print("SUCCESS: successfully initialized")
+                print("SUCCESS: Camera successfully initialized, Code in Frame generator class.")
             else:
                 print("WARNING: please check the camera connection. For testing you can use VLC player's IP Camera player option.")
         except Exception as e:
@@ -51,7 +51,9 @@ class FrameGenerator:
                 frame = self.camera_streams.read()
                 if frame is not None:
                     frame = imutils.resize(frame, width=self.width, height=self.height)
-                    asyncio.create_task(self.camera_processor.write_frame_to_disk_async(frame=frame))
+                    # asyncio.create_task(self.camera_processor.write_frame_to_disk_async(frame=frame))
+                    await asyncio.to_thread(self.camera_processor.write_frame_to_disk_async, frame)
+
                     self.frame_counters += 1
                     if self.database_data:
                         poly_info = self.database_data.get(self.camera_id).get("polygon_list")

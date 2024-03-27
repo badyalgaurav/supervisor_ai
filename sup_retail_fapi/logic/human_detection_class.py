@@ -150,7 +150,7 @@ class CameraProcessor:
         insert_events_db(self.user_id, self.camera_id, video_path, start_time, end_time)
         return "success"
 
-    def write_frame_to_disk_async(self, frame):
+    async def write_frame_to_disk_async(self, frame):
         current_time = time.time()
         # this if condition code is only for generating new file for video recording and saving current file + save the data to db if anytime within the range intrusion occurred.
         if self.start_time is None or current_time - self.start_time >= self.duration_per_file:
