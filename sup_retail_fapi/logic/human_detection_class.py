@@ -31,7 +31,7 @@ model_path = os.path.join(script_dir, "shoplifting_wights.pt")
 yolo_model = YOLO(model_path)
 
 # endregion
-
+print(yolo_model.names)
 
 confidence_threshold = 0.20
 
@@ -81,7 +81,7 @@ class CameraProcessor:
                 # if r.boxes.id is not None:
                 if len(r.boxes.xyxy.cpu()):
                     for c in r.boxes.cls:
-                        if int(c) == 0:  # 0=shoplifter
+                        if int(c) == 1:  # 0=shoplifter
                             boxes = r.boxes.xyxy.cpu()
                             self.frame_h_boxes.append(boxes)
                         else:
@@ -152,7 +152,7 @@ class CameraProcessor:
 
     def write_frame_to_disk_async(self, frame):
         current_time = time.time()
-        # this if condition code is only for generating new file for video recording and saving current file + save the data to db if anytime within the range intrusion occured.
+        # this if condition code is only for generating new file for video recording and saving current file + save the data to db if anytime within the range intrusion occurred.
         if self.start_time is None or current_time - self.start_time >= self.duration_per_file:
             # if self.video_writer.isOpened():  # Check if VideoWriter is open
             if self.is_person_in_warning:
@@ -160,12 +160,13 @@ class CameraProcessor:
                 end_save_time = datetime.datetime.now()
                 self.insert_event(self.video_filename, start_save_time, end_save_time)
                 self.is_person_in_warning = False
-                self.video_writer = self.generate_video_writer(frame=frame)
-                self.start_time = current_time
 
-            if self.video_writer is not None:
-                self.video_writer.release()
-                self.video_filename = self.generate_file_name()
+                if self.video_writer is not None:
+                    self.video_writer.release()
+                    self.video_filename = self.generate_file_name()
+
+            self.video_writer = self.generate_video_writer(frame=frame)
+            self.start_time = current_time
 
         if self.video_writer is not None and self.video_writer.isOpened():
             self.video_writer.write(frame)
@@ -178,19 +179,32 @@ class CameraProcessor:
         video_filename = f"{output_folder}/output_camera_{self.camera_id}_{current_datetime}.mp4"
         return video_filename
 
+    # def generate_video_writer(self, frame):
+    #     frame_height, frame_width, _ = frame.shape
+    #
+    #     # Set the codec explicitly to avoid FFMPEG fallback
+    #     fourcc = cv2.VideoWriter_fourcc(*'avc1')
+    #     # fourcc = cv2.VideoWriter_fourcc(*'h264')
+    #     # fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # cv2.VideoWriter_fourcc(*'h264')
+    #     # fourcc = cv2.VideoWriter_fourcc(*"MJPG")  # cv2.VideoWriter_fourcc(*'h264')
+    #     # fourcc = cv2.VideoWriter_fourcc(*"avc1")  # cv2.VideoWriter_fourcc(*'h264')
+    #     fps = 15
+    #     frame_size = (frame_width, frame_height)
+    #     video_writer = cv2.VideoWriter(self.video_filename, fourcc, fps, frame_size)
+    #     return video_writer
+
     def generate_video_writer(self, frame):
         frame_height, frame_width, _ = frame.shape
-
         # Set the codec explicitly to avoid FFMPEG fallback
         fourcc = cv2.VideoWriter_fourcc(*'avc1')
-        # fourcc = cv2.VideoWriter_fourcc(*'h264')
-        # fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # cv2.VideoWriter_fourcc(*'h264')
-        # fourcc = cv2.VideoWriter_fourcc(*"MJPG")  # cv2.VideoWriter_fourcc(*'h264')
-        # fourcc = cv2.VideoWriter_fourcc(*"avc1")  # cv2.VideoWriter_fourcc(*'h264')
         fps = 15
         frame_size = (frame_width, frame_height)
-        video_writer = cv2.VideoWriter(self.video_filename, fourcc, fps, frame_size)
-        return video_writer
+        try:
+            video_writer = cv2.VideoWriter(self.video_filename, fourcc, fps, frame_size)
+            return video_writer
+        except Exception as e:
+            print(f"Error creating VideoWriter: {e}")
+            return None
 
     # def release_video_writer(self):
     #     asyncio.create_task(self.release_video_writer_async())

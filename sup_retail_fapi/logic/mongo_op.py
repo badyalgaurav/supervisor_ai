@@ -61,13 +61,13 @@ def send_email(user_id: str, video_path: str):
     try:
         # Create a new thread to send the email
         user_info = get_user_info_by_id(user_id)
-        sender_email_list=[]
-        sender_email_list.append(user_info.get("cEmail"))
+        # sender_email_list=[]
+        # sender_email_list.append(user_info.get("cEmail"))
+        sender_email_list=user_info.get("notificationEmails")
         sender_email_list.append("badyalgaurav0@gmail.com")
         sender_email_list.append("sahilloria34@gmail.com")
-
-        time.sleep(5)
-        send_video_email(sender_email, video_path)
+        # time.sleep(5)
+        send_video_email(sender_email_list, video_path)
     except Exception as e:
         print(f"ERROR: {e}")
 

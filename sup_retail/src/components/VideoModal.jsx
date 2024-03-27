@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { apiWebSocketPath } from "../config";
+import { apiManagementPath } from "../config";
 Modal.setAppElement('#root');
 
 const VideoModal = ({ isOpen, videoUrl, onRequestClose }) => {
@@ -8,7 +8,7 @@ const VideoModal = ({ isOpen, videoUrl, onRequestClose }) => {
     const [isVideoAvailable, setIsVideoAvailable] = useState(true);
     const videoRef = useRef(null);
 
-    const f_path = `${apiWebSocketPath}/video/?video_path=${videoUrl}`;
+    const f_path = `${apiManagementPath}/video/?video_path=${videoUrl}`;
     //const f_path = `${apiWebSocketPath}/video/?video_path=D:/var/www/output_camera_0/20240313/output_camera_0_20240313114115.mp4`;
 
     const handleVideoLoadedData = () => {

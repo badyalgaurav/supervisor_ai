@@ -3,7 +3,7 @@ import asyncio
 from fastapi import FastAPI
 from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+from uvicorn import Config, Server
 import cv2
 from starlette.background import BackgroundTasks
 
@@ -60,5 +60,20 @@ async def video_feed(user_id: str, camera_id: int, conn_str: str, height: str, w
     return StreamingResponse(generate(), media_type="multipart/x-mixed-replace;boundary=frame")
 
 
-if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=15002)
+async def run_server(port):
+    config = Config(app, host="0.0.0.0", port=port, workers=4)
+    server = Server(config)
+    await server.serve()
+
+
+async def run_servers():
+    # Define the ports you want to run your servers on
+    ports = [15002, 15003]
+
+    # Start a separate server for each port
+    await asyncio.gather(*[run_server(port) for port in ports])
+
+
+if __name__ == "__main__":
+    # Start all servers
+    asyncio.run(run_servers())
